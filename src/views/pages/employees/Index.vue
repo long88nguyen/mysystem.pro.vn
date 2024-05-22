@@ -24,13 +24,31 @@
       </template>
     </a-table>
   </div>
+  <a-card hoverable style="width: 300px" class="mt-2">
+    <template #cover>
+      <img
+        alt="example"
+        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+      />
+    </template>
+    <template #actions>
+      <SettingOutlined key="setting" />
+      <edit-outlined key="edit" />
+      <ellipsis-outlined key="ellipsis" />
+    </template>
+    <a-card-meta title="Card title" description="This is the description">
+      <template #avatar>
+        <a-avatar src="https://joeschmoe.io/api/v1/random" />
+      </template>
+    </a-card-meta>
+  </a-card>
   <EmployeeCreateModal
     :isOpen="isOpenAddNewModal"
     @handleCancel="closeModal"
     @handleOk="updateList"
     v-if="isOpenAddNewModal"
   ></EmployeeCreateModal>
-  
+
   <a-pagination
     v-model:current="pagination.current_page"
     @change="changePage"
@@ -44,6 +62,7 @@
 <script setup>
 import axios from "axios";
 import { onMounted, ref } from "vue";
+import { SettingOutlined, EditOutlined, EllipsisOutlined } from "@ant-design/icons-vue";
 import moment from "moment";
 import { message } from "ant-design-vue";
 import EmployeeCreateModal from "./modals/EmployeeCreateModal.vue";
