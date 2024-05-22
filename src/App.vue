@@ -1,11 +1,10 @@
 <template>
-  <h1>test deploy</h1>
+  <Dashboard></Dashboard>
 </template>
 
-<script>
-export default {
-
-}
+<script setup>
+import EmployeeIndex from "./views/pages/employees/Index.vue"
+import Dashboard from "./views/Dashboard.vue"
 </script>
 
 <style>
