@@ -24,19 +24,6 @@
       </template>
     </a-table>
   </div>
-  <a-card hoverable style="width: 300px" class="mt-2">
-    <template #cover>
-      <img
-        alt="example"
-        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-      />
-    </template>
-    <template #actions>
-      <SettingOutlined key="setting" />
-      <edit-outlined key="edit" />
-      <ellipsis-outlined key="ellipsis" />
-    </template>
-  </a-card>
   <EmployeeCreateModal
     :isOpen="isOpenAddNewModal"
     @handleCancel="closeModal"
