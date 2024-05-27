@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="main_body p-3">
-                <EmployeeIndex></EmployeeIndex>
+                <router-view></router-view>
             </div>
         </div>
     </div>
