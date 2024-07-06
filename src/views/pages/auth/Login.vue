@@ -26,7 +26,7 @@ const login = async() => {
     {
         message.success('Login successful');
         router.push({
-            name: "Dashboard",
+            name: "Home",
         })
     }
 }

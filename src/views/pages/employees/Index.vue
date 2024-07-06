@@ -23,6 +23,14 @@
         </template>
       </template>
     </a-table>
+
+    <div class="mt-3">
+      <a-textarea class="mt-2" placeholder = "Nhập nội dung email ..." v-model:value = "emailContent">
+
+      </a-textarea>
+
+      <a-button class="mt-2" type = 'primary' @click="sendEmail">Gửi mail</a-button>
+    </div>
   </div>
   <EmployeeCreateModal
     :isOpen="isOpenAddNewModal"
@@ -48,11 +56,21 @@ import { SettingOutlined, EditOutlined, EllipsisOutlined } from "@ant-design/ico
 import moment from "moment";
 import { message } from "ant-design-vue";
 import EmployeeCreateModal from "./modals/EmployeeCreateModal.vue";
+import { mailStore } from "../../../store"
 
 const isOpenAddNewModal = ref(false);
+const emailContent = ref("Email test jobs")
 const url = import.meta.env.VITE_APP_API;
 const data = ref(null);
 const pagination = ref([]);
+
+const sendEmail = async() => {
+  let response = await mailStore().sendMail({content: emailContent.value})
+  if(response.status)
+  {
+    message.success('Gửi mail thành công !')
+  } 
+}
 
 const columns = ref([
   {
