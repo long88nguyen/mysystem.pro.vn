@@ -58,7 +58,6 @@ const playAudio = (url) => {
   audioPlay.addEventListener('ended', () => {
     audioPlaying.value = false;
   });
-
 }
 </script>
 

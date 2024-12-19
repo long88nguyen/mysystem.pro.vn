@@ -8,6 +8,7 @@
                 theme="light"
                 :inline-collapsed="state.collapsed"
                 :items="items"
+                @click="handleClick"
             ></a-menu>
         </div>
         <div class="body">
@@ -48,6 +49,7 @@
   <script setup>
   import { reactive, watch, h } from 'vue';
   import EmployeeIndex from "../views/pages/employees/Index.vue"
+  import { useRoute,useRouter } from 'vue-router';
   import {
     UserOutlined,
     PieChartOutlined,
@@ -56,26 +58,37 @@
     InboxOutlined,
     AppstoreOutlined,
   } from '@ant-design/icons-vue';
+
+  const route = useRoute();
+  const router = useRouter();
   const state = reactive({
     collapsed: false,
-    selectedKeys: ['1'],
+    selectedKeys: [route.name],
     openKeys: ['sub1'],
     preOpenKeys: ['sub1'],
   });
+  console.log(route.name);
+  
   const items = reactive([
     {
-      key: '1',
+      key: 'PronounCheck',
       icon: () => h(PieChartOutlined),
-      label: 'Option 1',
+      label: 'Check Phát âm',
       title: 'Option 1',
     },
     {
-      key: '2',
+      key: 'ListChatRoom',
       icon: () => h(DesktopOutlined),
-      label: 'Option 2',
+      label: 'Trợ lý ảo',
       title: 'Option 2',
     },
   ]);
+
+  const handleClick = (e) => {
+    router.push({
+      name: e.key
+    })
+  }
   watch(
     () => state.openKeys,
     (_val, oldVal) => {
