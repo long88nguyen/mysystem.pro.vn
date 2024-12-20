@@ -32,6 +32,6 @@ export const authStore = defineStore({
   },
 
   persist: {
-    storage: sessionStorage,
+    storage: localStorage,
   },
 });

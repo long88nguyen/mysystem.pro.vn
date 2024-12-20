@@ -34,4 +34,10 @@ export default [
         name: 'CreateRoom',
         component: () => import('../../views/pages/artificial-intelligence/CreateRoom.vue')
     },
+
+    {
+        path: '/artificial-intelligence/chat-room/:id',
+        name: 'ChatRoom',
+        component: () => import('../../views/pages/artificial-intelligence/ChatRoom.vue')
+    },
 ]

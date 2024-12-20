@@ -49,7 +49,6 @@ const form = reactive({
     model: null
 })
 
-
 const startRecording = () => {
   navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
     isRecording.value = true;
@@ -69,8 +68,6 @@ const stopRecording = () => {
     formData.append("audio", blob, "recorded_audio.wav");
     let response = await axios.post(apiURL + 'convert-speech-to-text', formData);
     
-    console.log(response);
-    
     if(response.status) 
     {
       isLoading.value = false;
@@ -79,7 +76,6 @@ const stopRecording = () => {
     }
   });
 };
-
 
 const submitRequest = async() => {
     isLoading.value = true;
