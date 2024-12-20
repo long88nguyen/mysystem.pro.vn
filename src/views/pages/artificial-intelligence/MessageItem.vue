@@ -1,19 +1,22 @@
 <template>
   <div class="message-system text-start" v-if = "message.role == 'system'">
-    <div class="message-content mt-2 d-flex">
+    <div class="message-content mt-1 d-flex">
         <img src="../../../assets/uploads/model_1.png" alt="" class="img-thumbnail avatar-circle">
         <div class="ms-2 message-text message-text-system">
-            {{ message.message }}
+            {{ message.content }}
             <div class="text-end mt-2">
-               <span><i class="fa-solid fa-volume-low text-gray"></i></span> <span class="ms-2"><i class="fa-solid fa-language text-gray"></i></span> 
+               <span>
+                <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
+                <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio"></i>
+            </span> <span class="ms-2"><i class="fa-solid fa-language text-gray"></i></span> 
             </div>
         </div>
     </div>
   </div>
   <div class="message-user" v-if = "message.role == 'user'">
-    <div class="message-content mt-2 d-flex justify-content-end mt-3">
+    <div class="message-content mt-1 d-flex justify-content-end">
         <div class="message-text message-text-user me-2">
-            {{ message.message }}
+            {{ message.content }}
         </div>
         <img src="../../../assets/uploads/model_3.png" alt="" class="img-thumbnail avatar-circle">
     </div>
@@ -23,8 +26,18 @@
 <script setup>
 import { toRefs } from 'vue';
 
-const props = defineProps(["message"])
-const { message } = toRefs(props)
+const props = defineProps(["message" , "messageKey"])
+const { message, messageKey } = toRefs(props)
+const playAudio = () => {
+    
+    let audioPlay = new Audio(message.value.audio);
+    message.value.isAudioPlaying = true;
+    audioPlay.currentTime = 0;
+    audioPlay.play();
+    audioPlay.addEventListener('ended', () => {
+        message.value.isAudioPlaying = false;
+    });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -40,6 +53,7 @@ const { message } = toRefs(props)
 
 .message-text{
     max-width: 50%;
+    min-width: 80px;
     height: auto;
     padding: 10px;
     border-radius: 10px;
