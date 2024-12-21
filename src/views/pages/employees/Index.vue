@@ -107,7 +107,7 @@ const fetchData = async (params = {}) => {
       id: item.id,
       key: index + 1,
       name: item.name,
-      age: item.age,
+      age: item.age,  
       created_at: moment(item.created_at).format("H:s DD/MM/YYYY"),
     }));
 

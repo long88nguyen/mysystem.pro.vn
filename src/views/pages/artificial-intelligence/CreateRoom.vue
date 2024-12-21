@@ -46,7 +46,7 @@ const chatRoom = reactive({
   language:'vi',
   bot_name:null,
   bot_avatar:null,
-  bot_desciption:null,
+  bot_description:null,
 });
 
 const botModels = ['model_1', 'model_2', 'model_3']

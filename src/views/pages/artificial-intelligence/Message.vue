@@ -26,7 +26,7 @@ const { messages, isResponseLoading } = toRefs(props)
 
 <style scoped lang="scss">
 .message-list{
-    height: 500px;
+    height: 600px;
     overflow-y: auto;
 }
 
