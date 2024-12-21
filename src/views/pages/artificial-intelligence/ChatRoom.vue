@@ -3,13 +3,12 @@
         <div class="chat-room-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="avatar">
-                    <img :src="`/src/assets/uploads/${dataMessages?.bot_avatar}.png`" alt="" width="50px" height="50px"
+                    <img src="../../../assets/uploads/model_1.png" alt="" width="50px" height="50px"
                         class="img-thumbnail" style="border-radius: 25px;">
                     <b class="ms-2">{{ dataMessages?.bot_name }}</b>
                 </div>
                 <h5>{{ dataMessages?.name }}</h5>
-                <router-link :to="{ name: 'ListChatRoom' }"><a-button>Quay lại<i
-                            class="fa-solid fa-arrow-right ms-2"></i></a-button></router-link>
+                <router-link :to="{ name: 'ListChatRoom' }"><a-button>Quay lại<i class="fa-solid fa-arrow-right ms-2"></i></a-button></router-link>
             </div>
         </div>
         <hr>
