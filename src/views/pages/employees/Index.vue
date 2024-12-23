@@ -26,7 +26,6 @@
 
     <div class="mt-3">
       <a-textarea class="mt-2" placeholder = "Nhập nội dung email ..." v-model:value = "emailContent">
-
       </a-textarea>
 
       <a-button class="mt-2" type = 'primary' @click="sendEmail">Gửi mail</a-button>

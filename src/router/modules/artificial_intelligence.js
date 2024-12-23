@@ -20,7 +20,13 @@ export default [
     {
         path: '/artificial-intelligence/pronoun-check',
         name: 'PronounCheck',
-        component: () => import('../../views/pages/artificial-intelligence/PronounCheck.vue')
+        component: () => import('../../views/pages/artificial-intelligence/PronunciationList.vue')
+    },
+
+    {
+        path: '/artificial-intelligence/pronoun-exam/:id',
+        name: 'PronunciationExam',
+        component: () => import('../../views/pages/artificial-intelligence/PronunciationExam.vue')
     },
 
     {

@@ -57,7 +57,7 @@ const fetch = async () => {
       chatRooms.value = response.data;
       dataTable.value = chatRooms.value.map((item, key) => ({
         key: key + 1,
-        id: key + 1,
+        id: item.id,
         name: item.name,
       }));
     })
