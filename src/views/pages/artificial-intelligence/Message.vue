@@ -8,8 +8,18 @@
             <div class="message-content mt-1 d-flex">
                 <img src="../../../assets/uploads/model_1.png" alt="" class="img-thumbnail avatar-circle">
                 <div class="ms-2 message-text message-text-system">
-                    <Loading></Loading>
+                    <Loading :color = "'black'"></Loading>
                 </div>
+            </div>
+        </div>
+
+        <div class="message-user" v-if = "isResponseUserLoading">
+            <div class="message-content mt-1 d-flex justify-content-end">
+                <div class="ms-2 message-text message-text-user">
+                    <Loading :color = "'white'"></Loading>
+                </div>
+                <img src="../../../assets/uploads/model_3.png" alt="" class="img-thumbnail avatar-circle">
+                
             </div>
         </div>
     </div>
@@ -20,13 +30,13 @@ import { toRefs } from 'vue';
 import MessageItem from './MessageItem.vue';
 import Loading from '../../components/Loading.vue';
 
-const props = defineProps(["messages", "isResponseLoading"])
-const { messages, isResponseLoading } = toRefs(props)
+const props = defineProps(["messages", "isResponseLoading", "isResponseUserLoading"])
+const { messages, isResponseLoading, isResponseUserLoading } = toRefs(props)
 </script>
 
 <style scoped lang="scss">
 .message-list{
-    height: 600px;
+    height: 400px;
     overflow-y: auto;
 }
 
@@ -47,6 +57,12 @@ const { messages, isResponseLoading } = toRefs(props)
 
 .message-text-system{
     background: #F0F0F0;
+
+}
+
+.message-text-user{
+    background: #009990;
+    color: white;
 
 }
 </style>

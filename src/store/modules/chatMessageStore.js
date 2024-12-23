@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { storeMessageText } from "../../api";
+import { storeMessageText, storeMessageSpeech } from "../../api";
 
 export const chatMessageStore = defineStore({
   namespaced: true,
@@ -8,6 +8,11 @@ export const chatMessageStore = defineStore({
   actions: {
     async storeMessageText(params) {
       const result = await storeMessageText(params);
+      return result;
+    },
+
+    async storeMessageSpeech(params) {
+      const result = await storeMessageSpeech(params);
       return result;
     },
   },

@@ -5,10 +5,29 @@
         <div class="ms-2 message-text message-text-system">
             {{ message.content }}
             <div class="text-end mt-2">
-               <span>
+            <span v-if="message?.audio">
+                <i class="fa-solid fa-gauge text-gray" @click="playAudio(0.5)" v-if="!message?.isAudioPlaying"></i>
+            </span>
+
+            <span class="ms-2" v-if="message?.audio">
                 <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
-                <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio"></i>
-            </span> <span class="ms-2"><i class="fa-solid fa-language text-gray"></i></span> 
+                <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio(1)"></i>
+            </span> 
+            <span>
+                
+            </span>
+            <span class="ms-2" v-if="message?.translation">
+                <i class="fa-solid fa-language text-gray" 
+                    data-bs-toggle="collapse" 
+                    :href="`#collapseExample${messageKey}`" 
+                    role="button" aria-expanded="false" 
+                    :aria-controls="`collapseExample${messageKey}`">
+                </i>
+            </span>
+
+            <div class="collapse" :id="`collapseExample${messageKey}`">
+                {{ message.translation }}
+            </div>
             </div>
         </div>
     </div>
@@ -17,6 +36,12 @@
     <div class="message-content mt-1 d-flex justify-content-end">
         <div class="message-text message-text-user me-2">
             {{ message.content }}
+            <div class="text-start">
+                <span class="ms-2" v-if="message?.audio">
+                    <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
+                    <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio(1)"></i>
+                </span>
+            </div>
         </div>
         <img src="../../../assets/uploads/model_3.png" alt="" class="img-thumbnail avatar-circle">
     </div>
@@ -28,22 +53,20 @@ import { toRefs } from 'vue';
 
 const props = defineProps(["message" , "messageKey"])
 const { message, messageKey } = toRefs(props)
-const playAudio = () => {
-    
+const playAudio = (speed = 1) => {
     let audioPlay = new Audio(message.value.audio);
     message.value.isAudioPlaying = true;
+    audioPlay.playbackRate = speed
     audioPlay.currentTime = 0;
     audioPlay.play();
     audioPlay.addEventListener('ended', () => {
         message.value.isAudioPlaying = false;
     });
 }
+
 </script>
 
 <style lang="scss" scoped>
-.message-system,.message-user{
-    
-}
 
 .avatar-circle{
     width: 40px;

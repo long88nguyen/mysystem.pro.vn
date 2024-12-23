@@ -13,12 +13,16 @@
         </div>
         <hr>
         <div class="chat-room-message">
-            <Message :messages="dataMessages?.messages" :isResponseLoading="isResponseLoading"></Message>
+            <Message :messages="dataMessages?.messages" :isResponseLoading="isResponseLoading" :isResponseUserLoading = "isResponseUserLoading"></Message>
         </div>
         <div class="chat-room-input mt-3">
             <form action="" @submit.prevent="sendMessage">
                 <a-input placeholder="Nhập..." class="w-100" v-model:value="message"></a-input>
             </form>
+            <div class="text-center mt-3">
+                <button class="btn btn-sm btn-success" v-if="isRecording" @click="stopRecording">Dừng lại</button>
+                <button class="btn btn-sm btn-primary" v-else @click="startRecording">Ghi âm</button>
+            </div>
         </div>
 
         <div class="chat-room-footer">
@@ -34,8 +38,16 @@ import { chatRoomStore, chatMessageStore } from '../../../store';
 import { nextTick, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Loading2 from "../../components/Loading2.vue"
+import RecordRTC from "recordrtc";
 
+const recorder = ref(null);
+const audioURL = ref(null);
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const audioResultUrl = ref(null)
+
+const isRecording = ref(false)
 const isResponseLoading = ref(false)
+const isResponseUserLoading = ref(false)
 const message = ref(null)
 const dataMessages = ref(null);
 const route = useRoute();
@@ -65,6 +77,7 @@ const sendMessage = async () => {
         role: "user",
         content: message.value
     })
+
     isResponseLoading.value = true;
     await chatMessageStore().storeMessageText({ chat_room_id: route.params.id, text: message.value }).then((response) => {
         dataMessages.value.messages.push(response.data)
@@ -75,8 +88,8 @@ const sendMessage = async () => {
         });
     }).catch((error) => {
         console.log(error);
-
     })
+    
     message.value = null;
 }
 
@@ -92,6 +105,41 @@ const playAudio = (url) => {
     audioPlay.currentTime = 0;
     audioPlay.play();
 }
+
+const startRecording = () => {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    isRecording.value = true;
+    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: isIOS ? "audio/m4a" : "audio/wav" });
+    recorder.value.startRecording();
+  });
+};
+
+const stopRecording = async () => {
+    isResponseUserLoading.value = true;
+    recorder.value.stopRecording(async () => {
+    const blob = recorder.value.getBlob();
+    const formData = new FormData();
+    formData.append("audio", blob, "recorded_audio.wav");
+    formData.append('chat_room_id', route.params.id)
+    isRecording.value = false;
+        
+    await chatMessageStore().storeMessageSpeech(formData).then((response) => {
+        dataMessages.value.messages.push(response.data)
+        isResponseUserLoading.value = false;
+        playAudio(response.data.audio);
+    }).catch((error) => {
+        console.log(error);
+    })
+
+    // let response = await axios.post(apiURL + 'convert-speech-to-text', formData);
+    
+    // if(response.status) 
+    // {
+    //   audioResultUrl.value = response.data.data.url;
+    //   playAudio(audioResultUrl.value)
+    // }
+  });
+};
 
 </script>
 
