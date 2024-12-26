@@ -6,7 +6,9 @@
             <a-input placeholder = "Enter name ..." class="mt-3" v-model:value = "userLogin.name"></a-input>
             <a-input type = "password" placeholder = "Enter password ..." class="mt-3" v-model:value = "userLogin.password"></a-input>
 
-            <a-button class = "mt-3 w-100" type = "primary" @click="login">Login</a-button>
+            <button class="btn btn-sm btn-primary mt-3 w-100">
+                Login
+            </button>
         </form>
     </div>
   </div>

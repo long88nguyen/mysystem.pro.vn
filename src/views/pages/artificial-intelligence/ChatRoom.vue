@@ -13,16 +13,25 @@
         </div>
         <hr>
         <div class="chat-room-message">
-            <Message :messages="dataMessages?.messages" :isResponseLoading="isResponseLoading" :isResponseUserLoading = "isResponseUserLoading"></Message>
+            <Message :messages="dataMessages?.messages" 
+            :isResponseLoading="isResponseLoading" 
+            :isResponseUserLoading = "isResponseUserLoading"
+            ref="chatMessagesRef" 
+            ></Message>
         </div>
-        <div class="chat-room-input mt-3">
+        <div class="chat-room-input mt-3" v-show="!isResponseLoading">
             <form action="" @submit.prevent="sendMessage">
                 <a-input placeholder="Nhập..." class="w-100" v-model:value="message"></a-input>
             </form>
-            <div class="text-center mt-3">
-                <button class="btn btn-sm btn-success" v-if="isRecording" @click="stopRecording">Dừng lại</button>
-                <button class="btn btn-sm btn-primary" v-else @click="startRecording">Ghi âm</button>
-            </div>
+            
+            <div class="pronunciation-exam-input text-center mt-3">
+                <i class="fa-regular fa-circle-stop icon-circle-2 text-danger mx-3" @click="stopRecording" v-if="isRecording"></i>
+                <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" @click="startRecording" v-else></i>
+             <div>
+            <TimerDisplay class="mt-2" v-if="isRecording"></TimerDisplay>
+      </div>
+
+    </div>
         </div>
 
         <div class="chat-room-footer">
@@ -39,6 +48,7 @@ import { nextTick, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Loading2 from "../../components/Loading2.vue"
 import RecordRTC from "recordrtc";
+import TimerDisplay from './TimerDisplay.vue';
 
 const recorder = ref(null);
 const audioURL = ref(null);
@@ -52,6 +62,9 @@ const message = ref(null)
 const dataMessages = ref(null);
 const route = useRoute();
 const isLoading2 = ref(false);
+const chatMessagesRef = ref(null);
+
+console.log(chatMessagesRef.value);
 
 const fetchData = async () => {
     isLoading2.value = true;
@@ -59,7 +72,9 @@ const fetchData = async () => {
         isLoading2.value = false;
         dataMessages.value = response.data
         nextTick(() => {
-            scrollToBottom();
+            setTimeout(() => {
+                chatMessagesRef.value.scrollToBottom();
+            }, 0);
         });
 
     }).catch((error) => {
@@ -68,7 +83,7 @@ const fetchData = async () => {
 }
 
 
-onMounted(() => {
+onMounted(async() => {
     fetchData();
 })
 
@@ -78,27 +93,27 @@ const sendMessage = async () => {
         content: message.value
     })
 
+    setTimeout(() => {
+        chatMessagesRef.value.scrollToBottom();
+    }, 0);
     isResponseLoading.value = true;
     await chatMessageStore().storeMessageText({ chat_room_id: route.params.id, text: message.value }).then((response) => {
         dataMessages.value.messages.push(response.data)
         isResponseLoading.value = false;
         playAudio(response.data.audio);
         nextTick(() => {
-            scrollToBottom();
+            setTimeout(() => {
+                chatMessagesRef.value.scrollToBottom();
+            }, 0);
         });
     }).catch((error) => {
         console.log(error);
     })
+
     
     message.value = null;
-}
 
-const scrollToBottom = () => {
-    const chatContainer = dataMessages.value.messages;
-    if (chatContainer) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-};
+}
 
 const playAudio = (url) => {
     let audioPlay = new Audio(url);
@@ -130,17 +145,19 @@ const stopRecording = async () => {
     }).catch((error) => {
         console.log(error);
     })
-
-    // let response = await axios.post(apiURL + 'convert-speech-to-text', formData);
-    
-    // if(response.status) 
-    // {
-    //   audioResultUrl.value = response.data.data.url;
-    //   playAudio(audioResultUrl.value)
-    // }
   });
 };
-
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.icon-circle-2 {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border-radius: 30px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  cursor: pointer;
+  font-size: 20px;
+}
+</style>

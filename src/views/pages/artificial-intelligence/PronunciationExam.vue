@@ -2,16 +2,20 @@
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
   <div class="pronunciation-exam mt-3 p-4" v-if="pronunciationData?.pronunciation_details[currentSection]">
-    <div class="pronunciation-exam-result text-center" v-if="examResult?.answer">
+    <div class="pronunciation-exam-result text-center" v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content">
       <p>
-        <span class="pronunciation-exam-result-text">{{ examResult?.answer }}</span>
+        <template v-for="(item,key) in JSON.parse(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.result)" :key="key">
+          <span class="pronunciation-exam-result-text" :class="item.is_correct ? 'text-success' : 'text-danger'">{{ item.word }}</span>
+        </template>
       </p>
       <p>
-        <a-progress type="circle" :percent="75" :size="80" />
+        <a-progress type="circle" :percent="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point" :size="80" />
       </p>
       <p>
-        <span class="pronunciation-exam-result-reaction text-success">Great job!
-          <i class="fa-solid fa-face-grin-hearts text-warning ms-2"></i></span>
+        <span class="pronunciation-exam-result-reaction" :class="reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.className">
+          {{ reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.text }}
+          <i class="text-primary ms-2" :class="reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.icon"></i>
+        </span>
       </p>
     </div>
 
@@ -38,8 +42,10 @@
     </div>
 
     <div class="pronunciation-exam-input text-center mt-2">
-
-      <i class="fa-solid fa-volume-low icon-circle-2 text-primary" v-if=" examResult?.url" @click="playAudio(1, examResult.url)"></i>
+      <i class="fa-solid fa-volume-low icon-circle-2 text-primary" 
+      v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio" 
+      @click="playAudio(1, pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio)">
+     </i>
       <i class="fa-regular fa-circle-stop icon-circle-2 text-danger mx-3" @click="stopRecord"
         v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></i>
       <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" v-else @click="startRecord"></i>
@@ -47,6 +53,8 @@
       <div>
         <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
       </div>
+
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -115,10 +123,58 @@ const stopRecord = () => {
   });
 }
 
-
+const uploadAudio = async(e) => {
+  isLoading.value = true;
+  let formData = new FormData();
+  formData.append("audio", e.target.files[0], "uploaded_audio.wav");
+  formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+  await pronunciationResultStore().storePronoun(formData).then((response) => {
+      if (response.status) {
+        isLoading.value = false;
+        examResult.value = response.data;
+        playAudio(1, examResult.value.url)
+        fetchData();
+      }
+    }).catch((error) => {
+      console.log(error);
+      isLoading.value = false;
+  });
+}
 onMounted(() => {
   fetchData()
 })
+
+const reactionResult = (score) => {
+  let className = '';
+  let text = '';
+  let icon = '';
+  
+    if(score < 70)
+    {
+      className = 'text-danger';
+      text = 'Try again';
+      icon = 'fa-solid fa-face-sad-cry'
+    }
+
+    if(score >= 70 && score <= 89)
+    {
+      className = 'text-warning';
+      text = 'Almost correct';
+      icon = 'fa-solid fa-face-laugh'
+    }
+
+    if(score >= 90)
+    {
+      className = 'text-success';
+      text = 'Great job';
+      icon = 'fa-solid fa-face-grin-hearts'
+    }
+    return {
+      className,
+      text,
+      icon
+    }
+}
 </script>
 
 <style lang="scss" scoped>

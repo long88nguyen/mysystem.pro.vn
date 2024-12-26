@@ -21,7 +21,7 @@
     </div>
     <div class="col-3">
       <a-input v-model:value = "chatRoom.bot_name" placeholder ="Nhập tên nhân vật ..."></a-input>
-      <a-input v-model:value = "chatRoom.bot_description" placeholder ="Nhập mô tả nhân vật ..." class="mt-2"></a-input>
+      <!-- <a-input v-model:value = "chatRoom.bot_description" placeholder ="Nhập mô tả nhân vật ..." class="mt-2"></a-input> -->
     </div>
   </a-card>
   <div class="text-center mt-2">
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import { LANGUAGES, VOICES, TEXT_TO_SPEECH_MODELS, SPEECH_TO_TEXT_MODELS, CHAT_GPT_MODELS } from "../../../constants/common"
 import { chatRoomStore } from "../../../store";
 import { useRoute, useRouter } from "vue-router";
@@ -43,10 +43,10 @@ const chatRoom = reactive({
   voice_model:'nova',
   speech_to_text_model:'whisper-1',
   chat_gpt_model:'gpt-3.5-turbo-0125',
-  language:'vi',
+  language:'en',
   bot_name:null,
   bot_avatar:null,
-  bot_description:null,
+  // bot_description:null,/
 });
 
 const botModels = ['model_1', 'model_2', 'model_3']
@@ -69,6 +69,8 @@ const createChatRoom = async () => {
     console.log(error);
   })
 }
+
+
 </script>
 
 <style scoped>

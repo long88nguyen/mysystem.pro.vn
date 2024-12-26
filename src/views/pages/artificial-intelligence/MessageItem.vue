@@ -25,8 +25,8 @@
                 </i>
             </span>
 
-            <div class="collapse" :id="`collapseExample${messageKey}`">
-                {{ message.translation }}
+            <div class="collapse" :id="`collapseExample${messageKey}`" style="font-size: 12px;">
+                <i>{{ message.translation }}</i>
             </div>
             </div>
         </div>

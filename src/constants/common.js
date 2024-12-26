@@ -77,4 +77,12 @@ export const CHAT_GPT_MODELS = [
         value: 'gpt-3.5-turbo-instruct',
         label: 'gpt-3.5-turbo-instruct'
     },
+    {
+        value: 'gpt-4o' ,
+        label: 'gpt-4o ($2.50 / 1M input tokens)'
+    },
+    {
+        value: 'gpt-4o-mini',
+        label: 'gpt-4o-mini ($0.150 / 1M input tokens)'
+    },
 ];
