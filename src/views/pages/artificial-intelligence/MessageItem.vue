@@ -5,9 +5,9 @@
         <div class="ms-2 message-text message-text-system">
             {{ message.content }}
             <div class="text-end mt-2">
-            <span v-if="message?.audio">
+            <!-- <span v-if="message?.audio">
                 <i class="fa-solid fa-gauge text-gray" @click="playAudio(0.5)" v-if="!message?.isAudioPlaying"></i>
-            </span>
+            </span> -->
 
             <span class="ms-2" v-if="message?.audio">
                 <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
@@ -55,12 +55,12 @@ const props = defineProps(["message" , "messageKey"])
 const { message, messageKey } = toRefs(props)
 const playAudio = (speed = 1) => {
     let audioPlay = new Audio(message.value.audio);
-    message.value.isAudioPlaying = true;
+    // message.value.isAudioPlaying = true;
     audioPlay.playbackRate = speed
     audioPlay.currentTime = 0;
     audioPlay.play();
     audioPlay.addEventListener('ended', () => {
-        message.value.isAudioPlaying = false;
+        // message.value.isAudioPlaying = false;
     });
 }
 

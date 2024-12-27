@@ -126,7 +126,7 @@ const playAudio = (url) => {
 const startRecording = () => {
   navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
     isRecording.value = true;
-    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: "audio/wav" });
+    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: isIOS ? "audio/m4a" : "audio/wav" });
     recorder.value.startRecording();
   });
 };

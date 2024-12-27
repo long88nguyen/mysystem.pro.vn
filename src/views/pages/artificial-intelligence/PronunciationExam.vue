@@ -4,9 +4,10 @@
   <div class="pronunciation-exam mt-3 p-4" v-if="pronunciationData?.pronunciation_details[currentSection]">
     <div class="pronunciation-exam-result text-center" v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content">
       <p>
-        <template v-for="(item,key) in JSON.parse(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.result)" :key="key">
+        <span class="pronunciation-exam-result-text">{{ pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content }}</span>
+        <!-- <template v-for="(item,key) in JSON.parse(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.result)" :key="key">
           <span class="pronunciation-exam-result-text" :class="item.is_correct ? 'text-success' : 'text-danger'">{{ item.word }}{{ item.word.split('').length > 1 ? '&nbsp;' : null }}</span>
-        </template>
+        </template> -->
       </p>
       <p>
         <a-progress type="circle" :percent="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point" :size="80" />
@@ -54,7 +55,7 @@
         <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
       </div>
 
-      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -96,7 +97,7 @@ const playAudio = (speed = 1, audioUrl = null) => {
 const startRecord = () => {
   navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
     pronunciationData.value.pronunciation_details[currentSection.value].isRecording = true;
-    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: "audio/wav" });
+    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: isIOS ? "audio/m4a" : "audio/wav" });
     recorder.value.startRecording();
   });
 }
@@ -124,23 +125,23 @@ const stopRecord = () => {
   });
 }
 
-// const uploadAudio = async(e) => {
-//   isLoading.value = true;
-//   let formData = new FormData();
-//   formData.append("audio", e.target.files[0], "uploaded_audio.wav");
-//   formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
-//   await pronunciationResultStore().storePronoun(formData).then((response) => {
-//       if (response.status) {
-//         isLoading.value = false;
-//         examResult.value = response.data;
-//         playAudio(1, examResult.value.url)
-//         fetchData();
-//       }
-//     }).catch((error) => {
-//       console.log(error);
-//       isLoading.value = false;
-//   });
-// }
+const uploadAudio = async(e) => {
+  isLoading.value = true;
+  let formData = new FormData();
+  formData.append("audio", e.target.files[0], "uploaded_audio.wav");
+  formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+  await pronunciationResultStore().storePronoun(formData).then((response) => {
+      if (response.status) {
+        isLoading.value = false;
+        examResult.value = response.data;
+        playAudio(1, examResult.value.url)
+        fetchData();
+      }
+    }).catch((error) => {
+      console.log(error);
+      isLoading.value = false;
+  });
+}
 onMounted(() => {
   fetchData()
 })
