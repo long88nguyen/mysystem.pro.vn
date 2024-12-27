@@ -23,9 +23,9 @@
     <div class="pronunciation-exam-question mt-4 p-3">
       <div class="pronunciation-exam-question-volumn text-start">
         <i class="fa-solid fa-backward-fast icon-circle text-primary"
-          @click="playAudio(0.5, pronunciationData?.pronunciation_details[currentSection]?.audio)"></i>
+          @click="playAudioQuestion(0.5, pronunciationData?.pronunciation_details[currentSection]?.audio)"></i>
         <i class="fa-solid fa-volume-low icon-circle ms-2 text-primary"
-          @click="playAudio(1, pronunciationData?.pronunciation_details[currentSection]?.audio)" disabled></i>
+          @click="playAudioQuestion(1, pronunciationData?.pronunciation_details[currentSection]?.audio)" disabled></i>
       </div>
       <div class="mt-3 text-center">
         <h4>{{ pronunciationData?.pronunciation_details[currentSection]?.content }}</h4>
@@ -101,6 +101,15 @@ const playAudio = (speed = 1, audioUrl = null) => {
   audioPlay.play();
   audioPlay.addEventListener('ended', () => {
     pronunciationData.value.pronunciation_details[currentSection.value].pronunciation_result.audioPlaying = false;
+  });
+}
+
+const playAudioQuestion = (speed = 1, audioUrl = null) => {
+  let audioPlay = new Audio(audioUrl);
+  audioPlay.playbackRate = speed
+  audioPlay.currentTime = 0;
+  audioPlay.play();
+  audioPlay.addEventListener('ended', () => {
   });
 }
 
