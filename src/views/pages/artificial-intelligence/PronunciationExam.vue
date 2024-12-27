@@ -64,7 +64,7 @@
         <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
       </div>
 
-      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
+      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
