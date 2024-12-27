@@ -63,6 +63,7 @@ const dataMessages = ref(null);
 const route = useRoute();
 const isLoading2 = ref(false);
 const chatMessagesRef = ref(null);
+const audioUser = ref(null)
 
 console.log(chatMessagesRef.value);
 
@@ -90,14 +91,15 @@ onMounted(async() => {
 const sendMessage = async () => {
     dataMessages.value.messages.push({
         role: "user",
-        content: message.value
+        content: message.value,
+        audio: audioUser.value
     })
 
     setTimeout(() => {
         chatMessagesRef.value.scrollToBottom();
     }, 0);
     isResponseLoading.value = true;
-    await chatMessageStore().storeMessageText({ chat_room_id: route.params.id, text: message.value }).then((response) => {
+    await chatMessageStore().storeMessageText({ chat_room_id: route.params.id, text: message.value, audio: audioUser.value }).then((response) => {
         dataMessages.value.messages.push(response.data)
         isResponseLoading.value = false;
         playAudio(response.data.audio);
@@ -130,6 +132,11 @@ const startRecording = () => {
 };
 
 const stopRecording = async () => {
+    nextTick(() => {
+        setTimeout(() => {
+            chatMessagesRef.value.scrollToBottom();
+        }, 0);
+    });
     isResponseUserLoading.value = true;
     recorder.value.stopRecording(async () => {
     const blob = recorder.value.getBlob();
@@ -139,9 +146,12 @@ const stopRecording = async () => {
     isRecording.value = false;
         
     await chatMessageStore().storeMessageSpeech(formData).then((response) => {
-        dataMessages.value.messages.push(response.data)
         isResponseUserLoading.value = false;
         playAudio(response.data.audio);
+        message.value = response.data.content
+        audioUser.value = response.data.audio
+        sendMessage()
+        
     }).catch((error) => {
         console.log(error);
     })

@@ -5,7 +5,7 @@
     <div class="pronunciation-exam-result text-center" v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content">
       <p>
         <template v-for="(item,key) in JSON.parse(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.result)" :key="key">
-          <span class="pronunciation-exam-result-text" :class="item.is_correct ? 'text-success' : 'text-danger'">{{ item.word }}</span>
+          <span class="pronunciation-exam-result-text" :class="item.is_correct ? 'text-success' : 'text-danger'">{{ item.word }}{{ item.word.split('').length > 1 ? '&nbsp;' : null }}</span>
         </template>
       </p>
       <p>
@@ -54,7 +54,7 @@
         <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
       </div>
 
-      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
+      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -114,6 +114,7 @@ const stopRecord = () => {
       if (response.status) {
         isLoading.value = false;
         examResult.value = response.data;
+        fetchData()
         playAudio(1, examResult.value.url)
       }
     }).catch((error) => {
@@ -123,23 +124,23 @@ const stopRecord = () => {
   });
 }
 
-const uploadAudio = async(e) => {
-  isLoading.value = true;
-  let formData = new FormData();
-  formData.append("audio", e.target.files[0], "uploaded_audio.wav");
-  formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
-  await pronunciationResultStore().storePronoun(formData).then((response) => {
-      if (response.status) {
-        isLoading.value = false;
-        examResult.value = response.data;
-        playAudio(1, examResult.value.url)
-        fetchData();
-      }
-    }).catch((error) => {
-      console.log(error);
-      isLoading.value = false;
-  });
-}
+// const uploadAudio = async(e) => {
+//   isLoading.value = true;
+//   let formData = new FormData();
+//   formData.append("audio", e.target.files[0], "uploaded_audio.wav");
+//   formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+//   await pronunciationResultStore().storePronoun(formData).then((response) => {
+//       if (response.status) {
+//         isLoading.value = false;
+//         examResult.value = response.data;
+//         playAudio(1, examResult.value.url)
+//         fetchData();
+//       }
+//     }).catch((error) => {
+//       console.log(error);
+//       isLoading.value = false;
+//   });
+// }
 onMounted(() => {
   fetchData()
 })
