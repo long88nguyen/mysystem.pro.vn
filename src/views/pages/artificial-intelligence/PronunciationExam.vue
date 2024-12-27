@@ -43,14 +43,23 @@
     </div>
 
     <div class="pronunciation-exam-input text-center mt-2">
+      <i class="fa-solid fa-volume-high icon-circle-2 text-primary"
+      v-if = "pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio && pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audioPlaying"
+      ></i>
       <i class="fa-solid fa-volume-low icon-circle-2 text-primary" 
-      v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio" 
+      v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio
+      && !pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audioPlaying
+      " 
       @click="playAudio(1, pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio)">
      </i>
+
       <i class="fa-regular fa-circle-stop icon-circle-2 text-danger mx-3" @click="stopRecord"
         v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></i>
+
       <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" v-else @click="startRecord"></i>
+
       <i class="fa-regular fa-flag icon-circle-2 text-primary"></i>
+
       <div>
         <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
       </div>
@@ -85,12 +94,13 @@ const fetchData = async () => {
 }
 
 const playAudio = (speed = 1, audioUrl = null) => {
-
+  pronunciationData.value.pronunciation_details[currentSection.value].pronunciation_result.audioPlaying = true;
   let audioPlay = new Audio(audioUrl);
   audioPlay.playbackRate = speed
   audioPlay.currentTime = 0;
   audioPlay.play();
   audioPlay.addEventListener('ended', () => {
+    pronunciationData.value.pronunciation_details[currentSection.value].pronunciation_result.audioPlaying = false;
   });
 }
 
