@@ -1,5 +1,5 @@
 <template>
-  <div class="message-system text-start" v-if = "message.role == 'system'">
+  <div class="message-system text-start" v-if = "message.role == 'assistant'">
     <div class="message-content mt-1 d-flex">
         <img src="../../../assets/uploads/model_1.png" alt="" class="img-thumbnail avatar-circle">
         <div class="ms-2 message-text message-text-system">

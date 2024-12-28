@@ -21,7 +21,7 @@
     </div>
     <div class="col-3">
       <a-input v-model:value = "chatRoom.bot_name" placeholder ="Nhập tên nhân vật ..."></a-input>
-      <!-- <a-input v-model:value = "chatRoom.bot_description" placeholder ="Nhập mô tả nhân vật ..." class="mt-2"></a-input> -->
+      <a-input v-model:value = "chatRoom.bot_description" placeholder ="Nhập yêu cầu ..." class="mt-2"></a-input>
     </div>
   </a-card>
   <div class="text-center mt-2">
@@ -46,7 +46,7 @@ const chatRoom = reactive({
   language:'en',
   bot_name:null,
   bot_avatar:null,
-  // bot_description:null,
+  bot_description:null,
 });
 
 const botModels = ['model_1', 'model_2', 'model_3']

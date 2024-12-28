@@ -66,8 +66,6 @@ watch(
 );
 
 onMounted(() => {
-    console.log(12);
-    
     scrollToBottom();
 });
 
@@ -78,7 +76,7 @@ defineExpose({
 
 <style scoped lang="scss">
 .message-list {
-  height: 500px;
+  height: 700px;
   overflow-y: auto;
 }
 
