@@ -21,7 +21,7 @@
     </div>
     <div class="col-3">
       <a-input v-model:value = "chatRoom.bot_name" placeholder ="Nhập tên nhân vật ..."></a-input>
-      <a-input v-model:value = "chatRoom.bot_description" placeholder ="Nhập yêu cầu ..." class="mt-2"></a-input>
+      <a-textarea v-model:value = "chatRoom.bot_description" placeholder ="Nhập yêu cầu ..." class="mt-2"></a-textarea>
     </div>
   </a-card>
   <div class="text-center mt-2">
@@ -42,7 +42,7 @@ const chatRoom = reactive({
   text_to_speech_model:'tts-1',
   voice_model:'nova',
   speech_to_text_model:'whisper-1',
-  chat_gpt_model:'gpt-3.5-turbo-0125',
+  chat_gpt_model:'gpt-4o',
   language:'en',
   bot_name:null,
   bot_avatar:null,

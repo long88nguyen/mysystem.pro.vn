@@ -1,5 +1,5 @@
 <template>
-  <div class="message-system text-start" v-if = "message.role == 'assistant'">
+<div class="message-system text-start" v-if = "message.role == 'assistant'">
     <div class="message-content mt-1 d-flex">
         <img src="../../../assets/uploads/model_1.png" alt="" class="img-thumbnail avatar-circle">
         <div class="ms-2 message-text message-text-system">
@@ -49,19 +49,28 @@
 </template>
 
 <script setup>
-import { toRefs } from 'vue';
+import { ref, toRefs } from 'vue';
 
 const props = defineProps(["message" , "messageKey"])
 const { message, messageKey } = toRefs(props)
 const playAudio = (speed = 1) => {
-    let audioPlay = new Audio(message.value.audio);
-    // message.value.isAudioPlaying = true;
-    audioPlay.playbackRate = speed
-    audioPlay.currentTime = 0;
-    audioPlay.play();
-    audioPlay.addEventListener('ended', () => {
-        // message.value.isAudioPlaying = false;
-    });
+    if(!message.value.isAudioPlaying)
+    {
+        let audioPlay = new Audio(message.value.audio);
+        message.value.isAudioPlaying = true
+        audioPlay.playbackRate = speed
+        audioPlay.currentTime = 0;
+        audioPlay.play();
+        audioPlay.addEventListener('ended', () => {
+            message.value.isAudioPlaying = false;
+        });
+    }
+    else
+    {
+        audioPlay.pause();
+        message.value.isAudioPlaying = false;
+    }
+    
 }
 
 </script>

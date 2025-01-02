@@ -60,7 +60,7 @@ const audioUpload = (e, questionKey) => {
 
 const saveQuestion = async() => {
     const formData = new FormData();
-    formData.append('topic_name', pronunciation.topic_name);
+    formData.append('topic_name', pronunciation.topic_name || '');
     pronunciation.pronunciation_details.forEach((detail, index) => {
         formData.append(`pronunciation_details[${index}][content]`, detail.content || '');
         formData.append(`pronunciation_details[${index}][ipa]`, detail.ipa || '');

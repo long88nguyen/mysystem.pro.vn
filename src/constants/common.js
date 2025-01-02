@@ -1,9 +1,5 @@
 export const LANGUAGES = [
     {
-        value: 'vi',
-        label: 'Tiếng Việt'
-    },
-    {
         value: 'en',
         label: 'Tiếng Anh'
     }

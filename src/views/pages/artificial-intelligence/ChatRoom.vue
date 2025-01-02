@@ -17,9 +17,13 @@
             :isResponseLoading="isResponseLoading" 
             :isResponseUserLoading = "isResponseUserLoading"
             ref="chatMessagesRef" 
-            ></Message>
+            >
+                <div class="text-end" v-if = "dataMessages?.messages?.length == 0">
+                    <a-button type = "primary" @click="startConversation"> Bắt đầu </a-button>
+                </div>
+            </Message>
         </div>
-        <div class="chat-room-input mt-3" v-show="!isResponseLoading">
+        <div class="chat-room-input mt-3" v-show="!isResponseLoading && dataMessages?.messages?.length">
             <form action="" @submit.prevent="sendMessage">
                 <a-input placeholder="Nhập..." class="w-100" v-model:value="message"></a-input>
             </form>
@@ -115,6 +119,11 @@ const sendMessage = async () => {
     
     message.value = null;
 
+}
+
+const startConversation = () => {
+    message.value = "Bắt đầu";
+    sendMessage();
 }
 
 const playAudio = (url) => {

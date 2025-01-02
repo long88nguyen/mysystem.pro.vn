@@ -7,7 +7,7 @@
         :isResponseLoading="isResponseLoading"
       />
     </template>
-
+    <slot></slot>
     <div class="message-system text-start" v-if="isResponseLoading">
       <div class="message-content mt-1 d-flex">
         <img
