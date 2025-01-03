@@ -48,7 +48,7 @@
 <script setup>
 import Message from './Message.vue';
 import { chatRoomStore, chatMessageStore } from '../../../store';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Loading2 from "../../components/Loading2.vue"
 import RecordRTC from "recordrtc";
@@ -68,8 +68,6 @@ const route = useRoute();
 const isLoading2 = ref(false);
 const chatMessagesRef = ref(null);
 const audioUser = ref(null)
-
-console.log(chatMessagesRef.value);
 
 const fetchData = async () => {
     isLoading2.value = true;
@@ -166,6 +164,17 @@ const stopRecording = async () => {
     })
   });
 };
+
+onUnmounted(() => {
+    dataMessages.value.messages.forEach((message) => {
+        console.log(message?.isAudioPlaying);
+        
+        if(message?.isAudioPlaying)
+        {   
+            message.isAudioPlaying = false;
+        }
+    })
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,21 +1,15 @@
 <template>
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
-  <div class="pronunciation-exam mt-3 p-4" v-if="pronunciationData?.pronunciation_details[currentSection]">
-    <div class="pronunciation-exam-result text-center" v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content">
+  <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
+    <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result">
       <p>
-        <span class="pronunciation-exam-result-text">{{ pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.content }}</span>
-        <!-- <template v-for="(item,key) in JSON.parse(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.result)" :key="key">
-          <span class="pronunciation-exam-result-text" :class="item.is_correct ? 'text-success' : 'text-danger'">{{ item.word }}{{ item.word.split('').length > 1 ? '&nbsp;' : null }}</span>
-        </template> -->
+        <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" />
       </p>
       <p>
-        <a-progress type="circle" :percent="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point" :size="80" />
-      </p>
-      <p>
-        <span class="pronunciation-exam-result-reaction" :class="reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.className">
-          {{ reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.text }}
-          <i class="text-primary ms-2" :class="reactionResult(pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.point)?.icon"></i>
+        <span class="pronunciation-exam-result-reaction" :class="reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.className">
+          {{ reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.text }}
+          <i class="text-primary ms-2" :class="reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.icon"></i>
         </span>
       </p>
     </div>
@@ -23,13 +17,21 @@
     <div class="pronunciation-exam-question mt-4 p-3">
       <div class="pronunciation-exam-question-volumn text-start">
         <i class="fa-solid fa-backward-fast icon-circle text-primary"
-          @click="playAudioQuestion(0.5, pronunciationData?.pronunciation_details[currentSection]?.audio)"></i>
+          @click="playAudioQuestion(0.5, currentSectionQuestion?.audio)"></i>
         <i class="fa-solid fa-volume-low icon-circle ms-2 text-primary"
-          @click="playAudioQuestion(1, pronunciationData?.pronunciation_details[currentSection]?.audio)" disabled></i>
+          @click="playAudioQuestion(1, currentSectionQuestion?.audio)" disabled></i>
       </div>
       <div class="mt-3 text-center">
-        <h4>{{ pronunciationData?.pronunciation_details[currentSection]?.content }}</h4>
-        <h5><i>{{ pronunciationData?.pronunciation_details[currentSection]?.ipa }}</i></h5>
+        <h4 v-if="currentSectionQuestion?.pronunciation_result?.result">
+          <template v-for="(item,key) in JSON.parse(currentSectionQuestion?.pronunciation_result?.result)" :key="key">
+            <span class="pronunciation-exam-result-text" :class="item.isCorrect ? 'text-success' : 'text-danger'">{{ item.text }}{{ item.text.split('').length > 1 ? '&nbsp;' : null }}</span>
+          </template>
+        </h4>
+        
+        <h4 v-else>
+          {{ currentSectionQuestion?.content }}
+        </h4>
+        <h5><i>{{ currentSectionQuestion?.ipa }}</i></h5>
       </div>
       <div class="text-end">
         <span>{{ currentSection + 1 }} of {{ pronunciationData?.pronunciation_details?.length }}</span>
@@ -44,27 +46,27 @@
 
     <div class="pronunciation-exam-input text-center mt-2">
       <i class="fa-solid fa-volume-high icon-circle-2 text-primary"
-      v-if = "pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio && pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audioPlaying"
+      v-if = "currentSectionQuestion?.pronunciation_result?.audio && currentSectionQuestion?.pronunciation_result?.audioPlaying"
       ></i>
       <i class="fa-solid fa-volume-low icon-circle-2 text-primary" 
-      v-if="pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio
-      && !pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audioPlaying
+      v-if="currentSectionQuestion?.pronunciation_result?.audio
+      && !currentSectionQuestion?.pronunciation_result?.audioPlaying
       " 
-      @click="playAudio(1, pronunciationData?.pronunciation_details[currentSection]?.pronunciation_result?.audio)">
+      @click="playAudio(1, currentSectionQuestion?.pronunciation_result?.audio)">
      </i>
 
       <i class="fa-regular fa-circle-stop icon-circle-2 text-danger mx-3" @click="stopRecord"
-        v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></i>
+        v-if="currentSectionQuestion?.isRecording"></i>
 
       <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" v-else @click="startRecord"></i>
 
       <i class="fa-regular fa-flag icon-circle-2 text-primary"></i>
 
       <div>
-        <TimerDisplay v-if="pronunciationData?.pronunciation_details[currentSection]?.isRecording"></TimerDisplay>
+        <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -74,7 +76,7 @@
 import Loading2 from '../../components/Loading2.vue';
 import { useRoute } from 'vue-router';
 import { pronunciationStore, pronunciationResultStore } from '../../../store';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -82,25 +84,38 @@ const isLoading = ref(false)
 const route = useRoute();
 const recorder = ref(null)
 const currentSection = ref(0);
+const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
 const examResult = ref(null)
+
 const fetchData = async () => {
+  isLoading.value = true;
   await pronunciationStore().getByIdExam(route.params.id).then((response) => {
     pronunciationData.value = response.data
+    pronunciationData.value.pronunciation_details?.forEach((value) => {
+      if(!value.pronunciation_result)
+      {
+        value.pronunciation_result = {}
+      }
+      value.pronunciation_result.audioPlaying = false
+    })
+    
+    currentSectionQuestion.value = pronunciationData.value.pronunciation_details[currentSection.value];
+    isLoading.value = false;
   }).catch((error) => {
     console.log(error);
-
+    isLoading.value = false;
   })
 }
 
 const playAudio = (speed = 1, audioUrl = null) => {
-  pronunciationData.value.pronunciation_details[currentSection.value].pronunciation_result.audioPlaying = true;
+  currentSectionQuestion.value.pronunciation_result.audioPlaying = true;
   let audioPlay = new Audio(audioUrl);
   audioPlay.playbackRate = speed
   audioPlay.currentTime = 0;
   audioPlay.play();
   audioPlay.addEventListener('ended', () => {
-    pronunciationData.value.pronunciation_details[currentSection.value].pronunciation_result.audioPlaying = false;
+    currentSectionQuestion.value.pronunciation_result.audioPlaying = false;
   });
 }
 
@@ -115,7 +130,7 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
 
 const startRecord = () => {
   navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-    pronunciationData.value.pronunciation_details[currentSection.value].isRecording = true;
+    currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { type: "audio", mimeType: isIOS ? "audio/m4a" : "audio/wav" });
     recorder.value.startRecording();
   });
@@ -196,6 +211,10 @@ const reactionResult = (score) => {
       icon
     }
 }
+
+watch(currentSection, (newValue, oldValue) => {
+  currentSectionQuestion.value = pronunciationData.value.pronunciation_details[newValue];
+})
 </script>
 
 <style lang="scss" scoped>

@@ -49,30 +49,39 @@
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue';
+import { onUnmounted, ref, toRefs } from 'vue';
 
 const props = defineProps(["message" , "messageKey"])
 const { message, messageKey } = toRefs(props)
+const audioPlay = ref(null)
 const playAudio = (speed = 1) => {
     if(!message.value.isAudioPlaying)
     {
-        let audioPlay = new Audio(message.value.audio);
+        if (!audioPlay.value) {
+            audioPlay.value = new Audio(message.value.audio);
+        }
         message.value.isAudioPlaying = true
-        audioPlay.playbackRate = speed
-        audioPlay.currentTime = 0;
-        audioPlay.play();
-        audioPlay.addEventListener('ended', () => {
+        audioPlay.value.playbackRate = speed
+        audioPlay.value.currentTime = 0;
+        audioPlay.value.play();
+        audioPlay.value.addEventListener('ended', () => {
             message.value.isAudioPlaying = false;
         });
     }
     else
     {
-        audioPlay.pause();
+        audioPlay.value.pause();
         message.value.isAudioPlaying = false;
     }
     
 }
 
+onUnmounted(() => {
+    if (audioPlay.value) {
+        audioPlay.value.pause();
+        audioPlay.value = null; // Giải phóng tài nguyên
+    }
+})
 </script>
 
 <style lang="scss" scoped>
