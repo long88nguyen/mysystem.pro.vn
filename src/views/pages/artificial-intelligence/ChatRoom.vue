@@ -7,7 +7,7 @@
                         class="img-thumbnail" style="border-radius: 25px;">
                     <b class="ms-2">{{ dataMessages?.bot_name }}</b>
                 </div>
-                <h5>{{ dataMessages?.name }}</h5>
+                <h6 class="conversation-name">{{ dataMessages?.name }}</h6>
                 <router-link :to="{ name: 'ListChatRoom' }"><a-button>Quay lại<i class="fa-solid fa-arrow-right ms-2"></i></a-button></router-link>
             </div>
         </div>
@@ -131,9 +131,21 @@ const playAudio = (url) => {
 }
 
 const startRecording = () => {
-  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+  navigator.mediaDevices.getUserMedia({ 
+    audio: {
+        sampleRate: 44100, // Chuẩn âm thanh chất lượng cao (44.1kHz)
+        channelCount: 1, // Ghi âm mono
+        echoCancellation: true, // Loại bỏ tiếng vang
+        noiseSuppression: true, // Giảm nhiễu
+        autoGainControl: true // Tự động điều chỉnh âm lượng
+    } 
+   }).then((stream) => {
     isRecording.value = true;
-    recorder.value = new RecordRTC(stream, { type: "audio", mimeType: isIOS ? "audio/m4a" : "audio/wav" });
+    recorder.value = new RecordRTC(stream, { 
+        type: "audio", 
+        mimeType: isIOS ? "audio/m4a" : "audio/wav",
+        desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
+     });
     recorder.value.startRecording();
   });
 };
@@ -187,5 +199,12 @@ onUnmounted(() => {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   cursor: pointer;
   font-size: 20px;
+}
+
+@media (max-width: 768px)
+{
+    .conversation-name{
+        display: none;
+    }
 }
 </style>

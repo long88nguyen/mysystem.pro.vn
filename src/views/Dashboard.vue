@@ -115,4 +115,13 @@
     height: 60px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
+
+@media (max-width: 768px) {
+  .sidebar{
+    width: 60px;
+}
+.body{
+    width: calc(100% - 60px);
+}
+}
 </style>

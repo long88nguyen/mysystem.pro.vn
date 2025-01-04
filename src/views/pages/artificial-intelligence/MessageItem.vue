@@ -11,7 +11,7 @@
 
             <span class="ms-2" v-if="message?.audio">
                 <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
-                <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio(1)"></i>
+                <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudioMessage"></i>
             </span> 
             <span>
                 
@@ -39,7 +39,7 @@
             <div class="text-start">
                 <span class="ms-2" v-if="message?.audio">
                     <i class="fa-solid fa-volume-high" v-if="message?.isAudioPlaying"></i>
-                    <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudio(1)"></i>
+                    <i class="fa-solid fa-volume-low text-gray" v-else @click="playAudioMessage"></i>
                 </span>
             </div>
         </div>
@@ -52,29 +52,9 @@
 import { onUnmounted, ref, toRefs } from 'vue';
 
 const props = defineProps(["message" , "messageKey"])
+const emits = defineEmits(["playAudioMessage"])
 const { message, messageKey } = toRefs(props)
 const audioPlay = ref(null)
-const playAudio = (speed = 1) => {
-    if(!message.value.isAudioPlaying)
-    {
-        if (!audioPlay.value) {
-            audioPlay.value = new Audio(message.value.audio);
-        }
-        message.value.isAudioPlaying = true
-        audioPlay.value.playbackRate = speed
-        audioPlay.value.currentTime = 0;
-        audioPlay.value.play();
-        audioPlay.value.addEventListener('ended', () => {
-            message.value.isAudioPlaying = false;
-        });
-    }
-    else
-    {
-        audioPlay.value.pause();
-        message.value.isAudioPlaying = false;
-    }
-    
-}
 
 onUnmounted(() => {
     if (audioPlay.value) {
@@ -82,6 +62,10 @@ onUnmounted(() => {
         audioPlay.value = null; // Giải phóng tài nguyên
     }
 })
+
+const playAudioMessage = () => {
+    emits("playAudioMessage", message.value);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -110,5 +94,21 @@ onUnmounted(() => {
     background: #009990;
     color: white;
 
+}
+
+@media (max-width: 768px)
+{
+    .message-text{
+    max-width: 100%;
+    font-size: 13px;
+    }
+    .avatar-circle{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    }
+    .message-user, .message-system{
+        margin-top: 10px;
+    }
 }
 </style>

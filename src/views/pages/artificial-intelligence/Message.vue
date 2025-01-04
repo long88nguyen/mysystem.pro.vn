@@ -5,6 +5,7 @@
         :message="message"
         :messageKey="messsageKey"
         :isResponseLoading="isResponseLoading"
+        @playAudioMessage="playAudioMessage"
       />
     </template>
     <slot></slot>
@@ -37,7 +38,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, toRefs, watch, defineExpose  } from "vue";
+import { onMounted, ref, toRefs, watch, defineExpose, onUnmounted } from "vue";
 import MessageItem from "./MessageItem.vue";
 import Loading from "../../components/Loading.vue";
 
@@ -47,30 +48,58 @@ const props = defineProps([
   "isResponseLoading",
   "isResponseUserLoading",
 ]);
+
+const isAudioPlaying = ref(false);
+const audioPlay = ref(null);
+
 const { messages, isResponseLoading, isResponseUserLoading } = toRefs(props);
 const scrollToBottom = () => {
   const container = messageContainer.value;
-  console.log(12);
-  
   if (container) {
     container.scrollTop = container.scrollHeight;
   }
 };
 
-watch(
-  () => messages.value,
-  () => {
-    scrollToBottom();
-  },
-  { deep: true }
-);
+const playAudioMessage = (message) => {
+  if (audioPlay.value) {
+    audioPlay.value.pause();
+    audioPlay.value = null;
+    messages.value.forEach((message) => {
+      message.isAudioPlaying = false;
+    });
+  }
+
+  message.isAudioPlaying = true;
+  audioPlay.value = new Audio(message.audio);
+  audioPlay.value.playbackRate = 1;
+  audioPlay.value.currentTime = 0;
+  audioPlay.value.play();
+  audioPlay.value.addEventListener("ended", () => {
+    message.isAudioPlaying = false;
+  });
+};
+
+// watch(
+//   () => messages.value,
+//   () => {
+//     scrollToBottom();
+//   },
+//   { deep: true }
+// );
 
 onMounted(() => {
-    scrollToBottom();
+  scrollToBottom();
 });
 
 defineExpose({
   scrollToBottom,
+});
+
+onUnmounted(() => {
+  if (audioPlay.value) {
+    audioPlay.value.pause();
+    audioPlay.value = null;
+  }
 });
 </script>
 
@@ -102,5 +131,24 @@ defineExpose({
 .message-text-user {
   background: #009990;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .message-list {
+    height: 400px;
+  }
+  .message-text {
+    max-width: 100%;
+    font-size: 13px;
+  }
+  .avatar-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+  }
+  .message-user,
+  .message-system {
+    margin-top: 10px;
+  }
 }
 </style>

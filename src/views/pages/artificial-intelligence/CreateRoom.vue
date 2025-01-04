@@ -1,7 +1,7 @@
 <template>
   <h5>Tạo phòng chat</h5>
   <a-card title="Cấu hình" class="w-100">
-    <div class="col-3">
+    <div class="col-12 col-md-3">
       <a-input v-model:value = "chatRoom.name" placeholder ="Nhập tên đoạn chat..."></a-input>
       <a-select v-model:value = "chatRoom.language" class="mt-2 w-100" placeholder = "-- Chọn ngôn ngữ --" :options = "LANGUAGES"></a-select>
       <a-select v-model:value = "chatRoom.voice_model" class="mt-2 w-100" placeholder = "-- Chọn giọng đọc --" :options = "VOICES"></a-select>
@@ -19,7 +19,7 @@
         </template>
       </p>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-md-3">
       <a-input v-model:value = "chatRoom.bot_name" placeholder ="Nhập tên nhân vật ..."></a-input>
       <a-textarea v-model:value = "chatRoom.bot_description" placeholder ="Nhập yêu cầu ..." class="mt-2"></a-textarea>
     </div>
@@ -74,6 +74,7 @@ const createChatRoom = async () => {
 </script>
 
 <style scoped>
+
 .border-avatar-selected {
   border: 2px solid #007bff;
 }
