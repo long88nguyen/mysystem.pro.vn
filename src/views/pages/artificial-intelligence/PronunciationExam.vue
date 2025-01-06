@@ -24,7 +24,7 @@
       <div class="mt-3 text-center">
         <h4 v-if="currentSectionQuestion?.pronunciation_result?.result">
           <template v-for="(item,key) in JSON.parse(currentSectionQuestion?.pronunciation_result?.result)" :key="key">
-            <span class="pronunciation-exam-result-text" :class="item.isCorrect ? 'text-success' : 'text-danger'">{{ item.text }}{{ item.text.split('').length > 1 ? '&nbsp;' : null }}</span>
+            <span class="pronunciation-exam-result-text" :class="item.isCorrect ? 'text-success' : 'text-danger'">{{ item.text }}{{ item?.text?.split('')?.length > 1 ? '&nbsp;' : null }}</span>
           </template>
         </h4>
         
