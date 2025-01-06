@@ -33,6 +33,8 @@
                 <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" @click="startRecording" v-else></i>
              <div>
             <TimerDisplay class="mt-2" v-if="isRecording"></TimerDisplay>
+            <pre>{{ audioURLNew }}</pre>
+            <audio :src="audioURLNew" controls></audio>
       </div>
 
     </div>
@@ -58,7 +60,7 @@ const recorder = ref(null);
 const audioURL = ref(null);
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const audioResultUrl = ref(null)
-
+const audioURLNew = ref(null)
 const isRecording = ref(false)
 const isResponseLoading = ref(false)
 const isResponseUserLoading = ref(false)
@@ -160,6 +162,7 @@ const stopRecording = async () => {
     recorder.value.stopRecording(async () => {
     const blob = recorder.value.getBlob();
     const formData = new FormData();
+    audioURLNew.value = URL.createObjectURL(blob)
     formData.append("audio", blob, "recorded_audio.wav");
     formData.append('chat_room_id', route.params.id)
     isRecording.value = false;
