@@ -67,6 +67,9 @@
       </div>
 
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
+    
+      <pre>{{ audioURLNew }}</pre>
+      <audio :src="audioURLNew" controls></audio>
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -86,7 +89,8 @@ const recorder = ref(null)
 const currentSection = ref(0);
 const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
-const examResult = ref(null)
+const examResult = ref(null);
+const audioURLNew = ref(null);
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -154,6 +158,7 @@ const stopRecord = () => {
 
     const blob = recorder.value.getBlob();
     const formData = new FormData();
+    audioURLNew.value = URL.createObjectURL(blob);
     pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
     formData.append("audio", blob, "recorded_audio.wav");
     formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
