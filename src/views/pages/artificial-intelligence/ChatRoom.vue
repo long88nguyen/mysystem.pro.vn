@@ -33,8 +33,8 @@
                 <i class="fa-solid fa-microphone-lines icon-circle-2 text-primary mx-3" @click="startRecording" v-else></i>
              <div>
             <TimerDisplay class="mt-2" v-if="isRecording"></TimerDisplay>
-            <pre>{{ audioURLNew }}</pre>
-            <audio :src="audioURLNew" controls></audio>
+            <!-- <pre>{{ audioURLNew }}</pre> -->
+            <!-- <audio :src="audioURLNew" controls></audio> -->
       </div>
 
     </div>

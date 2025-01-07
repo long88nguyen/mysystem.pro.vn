@@ -66,10 +66,10 @@
         <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
+      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
     
-      <pre>{{ audioURLNew }}</pre>
-      <audio :src="audioURLNew" controls></audio>
+      <!-- <pre>{{ audioURLNew }}</pre>/// -->
+      <!-- <audio :src="audioURLNew" controls></audio> -->
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
