@@ -21,6 +21,11 @@ export const pronunciationStore = defineStore({
       const result = await getByIdExam(id);
       return result;
     },
+
+    async updateExam(id, params) {
+      const result = await updateExam(id, params);
+      return result;
+    },
   },
   getters: {
     getState: (state) => state,

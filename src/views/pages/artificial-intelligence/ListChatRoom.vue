@@ -15,20 +15,25 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key == 'action'">
            <router-link :to = "{ name: 'ChatRoom', params: { id: record.id } }"><a-button type="link" ><i class="fa-solid fa-comments"></i></a-button></router-link> 
+           <i class="fa-solid fa-file-pen ms-2 text-success" @click="isOpenModal = true"></i>
         </template>
       </template>
     </a-table>
   </div>
   <Loading2 v-if="isLoading"/>
+  <EditChatRoom :isOpen = "isOpenModal" v-if = "isOpenModal" @handleCancel = "isOpenModal = false" @handleUpdate = "() => { isOpenModal = false; fetch() }"></EditChatRoom>
 </template>
 
 <script setup>
 import Loading2 from "../../components/Loading2.vue";
 import { onMounted, ref } from "vue";
 import { chatRoomStore } from "../../../store";
+import EditChatRoom from "./EditChatRoom.vue";
+
 const chatRooms = ref(null);
 const dataTable = ref([]);
 const isLoading = ref(false);
+const isOpenModal = ref(false);
 
 const columns = ref([
   {

@@ -16,3 +16,8 @@ export const getByIdExam = async (id) => {
     const response = await request.get(`${path}/get-by-id/${id}`)
     return response;
 }
+
+export const updateExam = async (id, params) => {
+    const response = await request.put(`${path}/update/${id}`, params)
+    return response
+}

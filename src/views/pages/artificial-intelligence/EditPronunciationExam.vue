@@ -1,10 +1,9 @@
 <template>
-    <a-modal :open = "isOpen" title = "Tạo mới bài tập" @cancel = "emits('closeModal')" class="custom-modal" @ok = "saveQuestion" :ok-text="'Lưu bài tập'">
-        <div class="pronunciation-form">
-            <a-input v-model:value="pronunciation.topic_name" placeholder = "Nhập chủ đề ..."></a-input>
-            <a-button class="mt-2" type = "primary" @click="addQuestion">Thêm câu hỏi</a-button>
-            
-            <table class="table table-bordered mt-2">
+  <a-modal :open = "isOpen" @cancel = "emits('handleCancel')" title="Cập nhật bài tập" style="width: 70%;" @ok = "updateExam" :ok-text = "'Cập nhật'">
+    <div v-if="pronunciation">
+          <a-input v-model:value="pronunciation.topic_name" placeholder = "Nhập chủ đề ..."></a-input>
+          <a-button class="mt-2" type = "primary" @click="addQuestion">Thêm câu hỏi</a-button>
+          <table class="table table-bordered mt-2">
                 <thead>
                     <tr>
                         <th>Nhập câu hỏi</th>
@@ -29,29 +28,32 @@
                     </template>
                 </tbody>
             </table>
-        </div>
-    </a-modal>
-    <Loading2 v-if="isLoading"></Loading2>
+    </div>
+  </a-modal>
 </template>
 
 <script setup>
-import { reactive, ref, toRefs } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 import { pronunciationStore } from '../../../store';
-import { message } from 'ant-design-vue';
-import Loading2 from '../../components/Loading2.vue';
+const props = defineProps(['isOpen', 'examId'])
+const { isOpen, examId } = toRefs(props)
+const emits = defineEmits(['handleCancel', 'handleOk'])
+const pronunciation = ref(null);
 
-const props = defineProps(["isOpen"])
-const emits = defineEmits(["closeModal", "handleOk"])
-const isOpen = toRefs(props);
-const isLoading = ref(false);
+const fetchData = async () => {
+  await pronunciationStore().getByIdExam(examId.value).then((response) => {
+    pronunciation.value =  response.data
+  }).catch((error) => {
+    console.log(error);
+  })
+}
 
-const pronunciation = reactive({
-    topic_name : null,
-    pronunciation_details : [],
+onMounted(() => {
+  fetchData();
 })
 
 const addQuestion = () => {
-    pronunciation.pronunciation_details.push({
+    pronunciation.value.pronunciation_details.push({
         content: null,
         ipa:null,
         audio: null,
@@ -59,14 +61,17 @@ const addQuestion = () => {
 }
 
 const audioUpload = (e, questionKey) => {
-    pronunciation.pronunciation_details[questionKey].audio = e.target.files[0]
+    pronunciation.value.pronunciation_details[questionKey].audio = e.target.files[0]
 }
 
-const saveQuestion = async() => {
-    isLoading.value = true;
+const deleteQuestion = (questionKey) => {
+    pronunciation.value.pronunciation_details.splice(questionKey, 1);
+}
+
+const updateExam = async() => {
     const formData = new FormData();
-    formData.append('topic_name', pronunciation.topic_name || '');
-    pronunciation.pronunciation_details.forEach((detail, index) => {
+    formData.append('topic_name', pronunciation.value.topic_name || '');
+    pronunciation.value.pronunciation_details.forEach((detail, index) => {
         formData.append(`pronunciation_details[${index}][content]`, detail.content || '');
         formData.append(`pronunciation_details[${index}][ipa]`, detail.ipa || '');
         if (detail.audio) {
@@ -74,27 +79,16 @@ const saveQuestion = async() => {
         }
     });
 
-    await pronunciationStore().storeExam(formData).then((response) => {
-        if(response.status)
-        {
-            isLoading.value = false;
-            message.success('Thêm mới bản ghi thành công');
-            emits('handleOk');   
-        }
+    await pronunciationStore().updateExam(examId.value, formData).then((response) => {
+        emits('handleOk');
+        message.success('Cập nhật bài tập thành công');
     }).catch((error) => {
         console.log(error);
+        message.error('Cập nhật bài tập thất bại');
     })
-    console.log(formData);   
-}
-
-const deleteQuestion = (questionKey) => {
-    console.log(questionKey);
-    pronunciation.pronunciation_details.splice(questionKey, 1);
 }
 </script>
 
-<style lang="scss" style>
-.custom-modal{
-    width: 70% !important;
-}
+<style>
+
 </style>
