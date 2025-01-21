@@ -69,6 +69,7 @@
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     
       <pre>{{ audioURLNew }}</pre>
+    
       <audio :src="audioURLNew" controls></audio>
     </div>
   </div>
@@ -166,12 +167,9 @@ const stopRecord = () => {
     await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        // examResult.value = response.data;
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        let audioUrl = isSafari ? response.data.url.replace('.wav', '.m4a') : response.data.url;
-        audioURLNew.value = audioUrl ? `${audioUrl}?t=${Date.now()}` : null;
+        examResult.value = response.data;
         fetchData()
-        playAudio(1, examResult.value.url)        
+        playAudio(1, examResult.value.url)
       }
     }).catch((error) => {
       console.log(error);
@@ -188,11 +186,8 @@ const uploadAudio = async(e) => {
   await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        // examResult.value = response.data;
-        // playAudio(1, examResult.value.url)
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        let audioUrl = isSafari ? response.data.url.replace('.wav', '.m4a') : response.data.url;
-        audioURLNew.value = audioUrl ? `${audioUrl}?t=${Date.now()}` : null;
+        examResult.value = response.data;
+        playAudio(1, examResult.value.url)
         fetchData();
       }
     }).catch((error) => {
@@ -280,14 +275,6 @@ watch(currentSection, (newValue, oldValue) => {
   font-size: 20px;
 }
 </style>
-
-
-
-
-
-
-
-
 
 
 
