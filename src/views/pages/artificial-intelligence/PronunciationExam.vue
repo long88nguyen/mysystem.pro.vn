@@ -82,6 +82,7 @@ import { pronunciationStore, pronunciationResultStore } from '../../../store';
 import { onMounted, ref, watch } from 'vue';
 import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
+
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isLoading = ref(false)
 const route = useRoute();
@@ -166,7 +167,9 @@ const stopRecord = () => {
       if (response.status) {
         isLoading.value = false;
         // examResult.value = response.data;
-        audioURLNew.value = response.data.url ? `${response.data.url}?t=${Date.now()}` : null;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        let audioUrl = isSafari ? response.data.url.replace('.wav', '.m4a') : response.data.url;
+        audioURLNew.value = audioUrl ? `${audioUrl}?t=${Date.now()}` : null;
         fetchData()
         playAudio(1, examResult.value.url)        
       }
@@ -187,7 +190,9 @@ const uploadAudio = async(e) => {
         isLoading.value = false;
         // examResult.value = response.data;
         // playAudio(1, examResult.value.url)
-        audioURLNew.value = response.data.url ? `${response.data.url}?t=${Date.now()}` : null;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        let audioUrl = isSafari ? response.data.url.replace('.wav', '.m4a') : response.data.url;
+        audioURLNew.value = audioUrl ? `${audioUrl}?t=${Date.now()}` : null;
         fetchData();
       }
     }).catch((error) => {
