@@ -69,6 +69,7 @@
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     
       <pre>{{ audioURLNew }}</pre>
+      <pre>{{ examResult?.text }}</pre>
     
       <audio :src="audioURLNew" controls></audio>
     </div>
@@ -160,14 +161,15 @@ const stopRecord = () => {
 
     const blob = recorder.value.getBlob();
     const formData = new FormData();
-    audioURLNew.value = URL.createObjectURL(blob);
     pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
     formData.append("audio", blob, "recorded_audio.wav");
     formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
     await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        examResult.value = response.data;
+        examResult.value = response.data ;
+        audioURLNew.value = response.data.url;
+
         fetchData()
         playAudio(1, examResult.value.url)
       }
@@ -187,7 +189,9 @@ const uploadAudio = async(e) => {
       if (response.status) {
         isLoading.value = false;
         examResult.value = response.data;
+        examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
         playAudio(1, examResult.value.url)
+        audioURLNew.value = examResult.value.url;
         fetchData();
       }
     }).catch((error) => {
