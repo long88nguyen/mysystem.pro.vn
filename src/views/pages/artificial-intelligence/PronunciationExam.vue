@@ -137,9 +137,9 @@ const startRecord = () => {
     audio: {
         sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
         channelCount: 1, // Ghi âm mono
-        // echoCancellation: true, // Loại bỏ tiếng vang
-        // noiseSuppression: true, // Giảm nhiễu
-        // autoGainControl: true // Tự động điều chỉnh âm lượng
+        echoCancellation: true, // Loại bỏ tiếng vang
+        noiseSuppression: true, // Giảm nhiễu
+        autoGainControl: true // Tự động điều chỉnh âm lượng
     } 
    }).then((stream) => {
     currentSectionQuestion.value.isRecording = true;
