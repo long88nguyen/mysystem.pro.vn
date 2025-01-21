@@ -145,7 +145,7 @@ const startRecord = () => {
     currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: isIOS ? "audio/m4a" : "audio/wav",
+      mimeType: "audio/wav",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
@@ -166,9 +166,9 @@ const stopRecord = () => {
       if (response.status) {
         isLoading.value = false;
         // examResult.value = response.data;
-        audioURLNew.value = response.data.url;
+        audioURLNew.value = response.data.url ? `${response.data.url}?t=${Date.now()}` : null;
         fetchData()
-        playAudio(1, examResult.value.url)
+        playAudio(1, examResult.value.url)        
       }
     }).catch((error) => {
       console.log(error);
@@ -187,7 +187,7 @@ const uploadAudio = async(e) => {
         isLoading.value = false;
         // examResult.value = response.data;
         // playAudio(1, examResult.value.url)
-        audioURLNew.value = response.data.url;
+        audioURLNew.value = response.data.url ? `${response.data.url}?t=${Date.now()}` : null;
         fetchData();
       }
     }).catch((error) => {
