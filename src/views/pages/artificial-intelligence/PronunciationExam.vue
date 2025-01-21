@@ -133,20 +133,12 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
 }
 
 const startRecord = () => {
-  navigator.mediaDevices.getUserMedia({ 
-    audio: {
-        sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
-        channelCount: 1, // Ghi âm mono
-        echoCancellation: true, // Loại bỏ tiếng vang
-        noiseSuppression: true, // Giảm nhiễu
-        autoGainControl: true // Tự động điều chỉnh âm lượng
-    } 
-   }).then((stream) => {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
     currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: "audio/wav",
-      desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
+      mimeType: "audio/m4a",
+      // desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
   });
@@ -160,7 +152,7 @@ const stopRecord = () => {
     const formData = new FormData();
     audioURLNew.value = URL.createObjectURL(blob);
     pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
-    formData.append("audio", blob, "recorded_audio.wav");
+    formData.append("audio", blob, "recorded_audio.m4a");
     formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
     await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
