@@ -167,11 +167,11 @@ const stopRecord = () => {
     await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        examResult.value = response.data ;
-        audioURLNew.value = response.data.url;
-
-        fetchData()
+        examResult.value = response.data;
+        examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
         playAudio(1, examResult.value.url)
+        audioURLNew.value = examResult.value.url;
+        fetchData();
       }
     }).catch((error) => {
       console.log(error);
