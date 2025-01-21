@@ -66,10 +66,10 @@
         <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     
-      <!-- <pre>{{ audioURLNew }}</pre>/// -->
-      <!-- <audio :src="audioURLNew" controls></audio> -->
+      <pre>{{ audioURLNew }}</pre>
+      <audio :src="audioURLNew" controls></audio>
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -135,7 +135,7 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
 const startRecord = () => {
   navigator.mediaDevices.getUserMedia({ 
     audio: {
-        sampleRate: 44100, // Chuẩn âm thanh chất lượng cao (44.1kHz)
+        sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
         channelCount: 1, // Ghi âm mono
         echoCancellation: true, // Loại bỏ tiếng vang
         noiseSuppression: true, // Giảm nhiễu
@@ -145,7 +145,7 @@ const startRecord = () => {
     currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: isIOS ? "audio/m4a" : "audio/wav",
+      mimeType: "audio/wav",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
@@ -165,7 +165,8 @@ const stopRecord = () => {
     await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        examResult.value = response.data;
+        // examResult.value = response.data;
+        audioURLNew.value = response.data.url;
         fetchData()
         playAudio(1, examResult.value.url)
       }
@@ -184,8 +185,9 @@ const uploadAudio = async(e) => {
   await pronunciationResultStore().storePronoun(formData).then((response) => {
       if (response.status) {
         isLoading.value = false;
-        examResult.value = response.data;
-        playAudio(1, examResult.value.url)
+        // examResult.value = response.data;
+        // playAudio(1, examResult.value.url)
+        audioURLNew.value = response.data.url;
         fetchData();
       }
     }).catch((error) => {
@@ -273,3 +275,36 @@ watch(currentSection, (newValue, oldValue) => {
   font-size: 20px;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
