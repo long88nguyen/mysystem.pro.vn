@@ -1,6 +1,10 @@
 <template>
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
+    <div class="text-center" v-if="currentSectionQuestion?.audio">
+      <pre>{{ currentSectionQuestion?.audio }}</pre>
+      <audio :src="currentSectionQuestion?.audio" controls></audio>
+    </div>
   <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
     <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result">
       <p>
@@ -13,7 +17,6 @@
         </span>
       </p>
     </div>
-
     <div class="pronunciation-exam-question mt-4 p-3">
       <div class="pronunciation-exam-question-volumn text-start">
         <i class="fa-solid fa-backward-fast icon-circle text-primary"
