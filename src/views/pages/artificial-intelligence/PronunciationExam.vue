@@ -71,10 +71,10 @@
 
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     
-      <pre>{{ audioURLNew }}</pre>
+      <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre>
       <pre>{{ examResult?.text }}</pre>
     
-      <audio :src="audioURLNew" controls></audio>
+      <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio>
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
