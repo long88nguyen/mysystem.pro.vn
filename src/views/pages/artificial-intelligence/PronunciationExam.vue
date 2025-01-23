@@ -75,6 +75,8 @@
       <pre>{{ examResult?.text }}</pre>
     
       <pre>{{ examResult?.audioInfo }}</pre>
+      <p>isIOS : {{ isIOS }}</p>
+      <p>isSafari : {{ isSafari }}</p>
       <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio>
     </div>
   </div>
@@ -88,6 +90,7 @@ import { pronunciationStore, pronunciationResultStore } from '../../../store';
 import { onMounted, ref, watch } from 'vue';
 import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
+import toWav from 'audiobuffer-to-wav';
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isLoading = ref(false)
@@ -98,6 +101,7 @@ const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
 const examResult = ref(null);
 const audioURLNew = ref(null);
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -137,6 +141,10 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
   audioPlay.play();
   audioPlay.addEventListener('ended', () => {
   });
+
+  // Convert WebM/MP4 to WAV
+  const audioContext = new AudioContext();
+  const fileReader = new FileReader();
 }
 
 const startRecord = () => {
@@ -152,7 +160,7 @@ const startRecord = () => {
     currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: "audio/wav",
+      mimeType: isSafari ? 'audio/m4a' : "audio/wav",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
@@ -164,23 +172,32 @@ const stopRecord = () => {
   recorder.value.stopRecording(async () => {
 
     const blob = recorder.value.getBlob();
-    const formData = new FormData();
-    pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
-    formData.append("audio", blob, "recorded_audio.wav");
-    formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
-    await pronunciationResultStore().storePronoun(formData).then((response) => {
-      if (response.status) {
+    // Convert WebM/MP4 to WAV
+    const audioContext = new AudioContext();
+    const fileReader = new FileReader();
+    fileReader.onload = async () => {
+      const arrayBuffer = fileReader.result;
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      const wavBlob = new Blob([toWav(audioBuffer)], { type: "audio/wav" });
+
+      const formData = new FormData();
+      pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
+      formData.append("audio", wavBlob,  "recorded_audio.wav");
+      formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+      await pronunciationResultStore().storePronoun(formData).then((response) => {
+        if (response.status) {
+          isLoading.value = false;
+          examResult.value = response.data;
+          examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
+          playAudio(1, examResult.value.url)
+          audioURLNew.value = examResult.value.url;
+          fetchData();
+        }
+      }).catch((error) => {
+        console.log(error);
         isLoading.value = false;
-        examResult.value = response.data;
-        examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
-        playAudio(1, examResult.value.url)
-        audioURLNew.value = examResult.value.url;
-        fetchData();
+      });
       }
-    }).catch((error) => {
-      console.log(error);
-      isLoading.value = false;
-    });
   });
 }
 
