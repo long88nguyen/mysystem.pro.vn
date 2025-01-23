@@ -160,7 +160,7 @@ const startRecord = () => {
     currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: isSafari ? 'audio/m4a' : "audio/wav",
+      mimeType: "webm",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
@@ -197,7 +197,8 @@ const stopRecord = () => {
         console.log(error);
         isLoading.value = false;
       });
-      }
+    }
+    fileReader.readAsArrayBuffer(blob);
   });
 }
 
