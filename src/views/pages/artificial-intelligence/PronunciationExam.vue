@@ -76,6 +76,7 @@
       <p>isIOS : {{ isIOS }}</p>
       <p>isSafari : {{ isSafari }}</p>
       <p>confidence : {{ examResult?.confidence }}</p>
+      <p>words : {{ examResult?.words }}</p>
       <!-- <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio> -->
     </div>
   </div>
