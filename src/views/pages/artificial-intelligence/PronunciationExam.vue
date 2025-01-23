@@ -74,6 +74,7 @@
       <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre>
       <pre>{{ examResult?.text }}</pre>
     
+      <pre>{{ examResult?.audioInfo }}</pre>
       <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio>
     </div>
   </div>
