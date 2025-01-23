@@ -1,12 +1,12 @@
 <template>
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
-    <div class="text-center" v-if="currentSectionQuestion?.audio">
+    <!-- <div class="text-center" v-if="currentSectionQuestion?.audio">
       <pre>{{ currentSectionQuestion?.audio }}</pre>
       <audio :src="currentSectionQuestion?.audio" controls></audio>
-    </div>
+    </div> -->
   <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
-    <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result">
+    <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result?.content">
       <p>
         <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" />
       </p>
@@ -69,15 +69,13 @@
         <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
-    
-      <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre>
-      <pre>{{ examResult?.text }}</pre>
-    
-      <pre>{{ examResult?.audioInfo }}</pre>
+      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <!-- <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre> -->
+      <p class="mt-3">{{ currentSectionQuestion?.pronunciation_result?.content }}</p>
+      <!-- <pre>{{ examResult?.audioInfo }}</pre> -->
       <p>isIOS : {{ isIOS }}</p>
       <p>isSafari : {{ isSafari }}</p>
-      <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio>
+      <!-- <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio> -->
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -141,10 +139,6 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
   audioPlay.play();
   audioPlay.addEventListener('ended', () => {
   });
-
-  // Convert WebM/MP4 to WAV
-  const audioContext = new AudioContext();
-  const fileReader = new FileReader();
 }
 
 const startRecord = () => {

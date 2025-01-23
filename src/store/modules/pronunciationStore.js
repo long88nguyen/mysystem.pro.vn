@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { storeExam,getAllExam,
+import { storeExam,getAllExam,updatePronunciationExam,deletePronunciationExam,
   getByIdExam } from "../../api";
 
 export const pronunciationStore = defineStore({
@@ -22,8 +22,13 @@ export const pronunciationStore = defineStore({
       return result;
     },
 
-    async updateExam(id, params) {
-      const result = await updateExam(id, params);
+    async updatePronunciationExam(id, params) {
+      const result = await updatePronunciationExam(id, params);
+      return result;
+    },
+
+    async deletePronunciationExam(id) {
+      const result = await deletePronunciationExam(id);
       return result;
     },
   },

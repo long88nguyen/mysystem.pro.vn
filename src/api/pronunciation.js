@@ -17,7 +17,12 @@ export const getByIdExam = async (id) => {
     return response;
 }
 
-export const updateExam = async (id, params) => {
-    const response = await request.put(`${path}/update/${id}`, params)
+export const updatePronunciationExam = async (id, params) => {
+    const response = await request.post(`${path}/update/${id}`, params)
+    return response
+}
+
+export const deletePronunciationExam = async (id) => {
+    const response = await request.delete(`${path}/delete/${id}`)
     return response
 }

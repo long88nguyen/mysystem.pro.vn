@@ -3,7 +3,6 @@
   <div class="text-end">
     <a-button type = "primary" @click="isOpenCreateModal = true">Tạo mới bài tập</a-button>
   </div>
-<pre>{{ isOpenEditModal }}</pre>
   <a-table
       :dataSource="dataTable"
       :columns="columns"
@@ -14,12 +13,20 @@
         <template v-if="column.key == 'action'">
            <router-link :to = "{ name: 'PronunciationExam', params: { id: record.id } }"><a-button type="primary" >Thực hành</a-button></router-link>
            <a-button class="ms-1 btn-success" @click="() => { isOpenEditModal = true, examId = record.id }" >Cập nhât</a-button> 
+           <a-popconfirm
+              title="Xác nhận xóa?"
+              ok-text="Xóa"
+              cancel-text="Hủy"
+              @confirm="deleteRecord(record.id)"
+            >
+           <a-button class="ms-1 btn-danger">Xóa</a-button> 
+           </a-popconfirm>
         </template>
       </template>
     </a-table>
   <CreatePronunciationExam :isOpen = "isOpenCreateModal" @closeModal = "isOpenCreateModal = false" v-if="isOpenCreateModal" @handleOk = "() => { isOpenCreateModal = false, fetchData() }">
   </CreatePronunciationExam>
-  <EditPronunciationExam :isOpen = "isOpenEditModal" @handleCancel = "isOpenEditModal = false" v-if="isOpenEditModal" :examId = "examId"></EditPronunciationExam>
+  <EditPronunciationExam :isOpen = "isOpenEditModal" @handleCancel = "isOpenEditModal = false" v-if="isOpenEditModal" :examId = "examId" @handleOk = "() => {isOpenEditModal = false ,  fetchData()}"></EditPronunciationExam>
 
   <Loading2 v-if = "isLoading2"></Loading2>
 </template>
@@ -31,6 +38,7 @@ import CreatePronunciationExam from './CreatePronunciationExam.vue';
 import EditPronunciationExam from './EditPronunciationExam.vue';
 import Loading2 from '../../components/Loading2.vue';
 import moment from 'moment';
+import { message } from 'ant-design-vue';
 
 const examId = ref(null);
 const isLoading2 = ref(false);
@@ -76,6 +84,14 @@ const fetchData = async () => {
   })
 }
 
+const deleteRecord = async (id) => {
+    await pronunciationStore().deletePronunciationExam(id).then((response) => {
+        message.success('Xóa thành công');
+        fetchData();
+    }).catch((error) => {
+        console.log(error);
+    })
+}
 onMounted(() => {
   fetchData()
 })
