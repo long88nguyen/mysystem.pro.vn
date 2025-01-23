@@ -69,12 +69,13 @@
         <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
       <!-- <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre> -->
       <p class="mt-3">{{ currentSectionQuestion?.pronunciation_result?.content }}</p>
       <!-- <pre>{{ examResult?.audioInfo }}</pre> -->
       <p>isIOS : {{ isIOS }}</p>
       <p>isSafari : {{ isSafari }}</p>
+      <p>confidence : {{ examResult?.confidence }}</p>
       <!-- <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio> -->
     </div>
   </div>
