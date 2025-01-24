@@ -237,7 +237,7 @@ const reactionResult = (score) => {
       color = '#dc3545';
     }
 
-    if(score >= 70 && score <= 89)
+    if(score >= 70 && score < 85)
     {
       className = 'text-warning';
       text = 'Almost correct';
@@ -246,7 +246,7 @@ const reactionResult = (score) => {
   
     }
 
-    if(score >= 90)
+    if(score >= 85)
     {
       className = 'text-success';
       text = 'Great job';
@@ -267,11 +267,11 @@ const textClass = (word) => {
   {
     className = 'text-danger'
   }
-  if(word?.confidence >= 70 && word?.confidence < 89)
+  if(word?.confidence >= 70 && word?.confidence < 85)
   {
     className = 'text-warning'
   }
-  if(word?.confidence >= 90)
+  if(word?.confidence >= 85)
   {
     className = 'text-success'
   }
