@@ -267,11 +267,11 @@ const textClass = (word) => {
   {
     className = 'text-danger'
   }
-  if(word?.confidence >= 70 && word?.confidence < 85)
+  if(word?.confidence >= 70 && word?.confidence < 89)
   {
     className = 'text-warning'
   }
-  if(word?.confidence >= 85)
+  if(word?.confidence >= 90)
   {
     className = 'text-success'
   }
