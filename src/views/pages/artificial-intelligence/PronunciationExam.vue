@@ -8,7 +8,7 @@
   <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
     <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result?.content">
       <p>
-        <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" />
+        <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" :strokeColor = "reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.color"/>
       </p>
       <p>
         <span class="pronunciation-exam-result-reaction" :class="reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.className">
@@ -27,7 +27,7 @@
       <div class="mt-3 text-center">
         <h4 v-if="currentSectionQuestion?.pronunciation_result?.result">
           <template v-for="(item,key) in JSON.parse(currentSectionQuestion?.pronunciation_result?.result)" :key="key">
-            <span class="pronunciation-exam-result-text" :class="item.isCorrect ? 'text-success' : 'text-danger'">{{ item.text }}{{ item?.text?.split('')?.length > 1 ? '&nbsp;' : null }}</span>
+            <span class="pronunciation-exam-result-text" :class="textClass(item)">{{ item.text }}</span>&nbsp;
           </template>
         </h4>
         
@@ -69,14 +69,15 @@
         <TimerDisplay v-if="currentSectionQuestion?.isRecording"></TimerDisplay>
       </div>
 
-      <!-- <input type="file" class="mt-3 form-control" @change="uploadAudio($event)"> -->
+      <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
       <!-- <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre> -->
       <p class="mt-3">{{ currentSectionQuestion?.pronunciation_result?.content }}</p>
       <!-- <pre>{{ examResult?.audioInfo }}</pre> -->
-      <p>isIOS : {{ isIOS }}</p>
-      <p>isSafari : {{ isSafari }}</p>
-      <p>confidence : {{ examResult?.confidence }}</p>
-      <p>words : {{ examResult?.words }}</p>
+      <!-- <p>isIOS : {{ isIOS }}</p> -->
+      <!-- <p>isSafari : {{ isSafari }}</p> -->
+      <!-- <p>confidence : {{ examResult?.confidence }}</p> -->
+      <!-- <p>words : {{ examResult?.words }}</p> -->
+      <!-- <pre>{{  currentSectionQuestion?.pronunciation_result?.result ? JSON.parse(currentSectionQuestion?.pronunciation_result?.result) : '' }}</pre> -->
       <!-- <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio> -->
     </div>
   </div>
@@ -225,32 +226,59 @@ const reactionResult = (score) => {
   let className = '';
   let text = '';
   let icon = '';
+  let color = '';
+
   
     if(score < 70)
     {
       className = 'text-danger';
       text = 'Try again';
-      icon = 'fa-solid fa-face-sad-cry'
+      icon = 'fa-solid fa-face-sad-cry';
+      color = '#dc3545';
     }
 
     if(score >= 70 && score <= 89)
     {
       className = 'text-warning';
       text = 'Almost correct';
-      icon = 'fa-solid fa-face-laugh'
+      icon = 'fa-solid fa-face-laugh';
+      color = '#ffc107';
+  
     }
 
     if(score >= 90)
     {
       className = 'text-success';
       text = 'Great job';
-      icon = 'fa-solid fa-face-grin-hearts'
+      icon = 'fa-solid fa-face-grin-hearts';
+      color = '#198754';
     }
     return {
       className,
       text,
-      icon
+      icon,
+      color
     }
+}
+
+const textClass = (word) => {
+  let className = ''
+  if(word?.confidence < 70)
+  {
+    className = 'text-danger'
+  }
+  if(word?.confidence >= 70 && word?.confidence < 85)
+  {
+    className = 'text-warning'
+  }
+  if(word?.confidence >= 85)
+  {
+    className = 'text-success'
+  }
+     
+  console.log(className);
+  
+  return className;
 }
 
 watch(currentSection, (newValue, oldValue) => {
