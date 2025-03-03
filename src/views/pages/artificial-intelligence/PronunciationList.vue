@@ -3,6 +3,8 @@
   <div class="text-end">
     <a-button type = "primary" @click="isOpenCreateModal = true">Tạo mới bài tập</a-button>
   </div>
+  <pre>{{ getDeviceInfo() }}</pre>
+
   <a-table
       :dataSource="dataTable"
       :columns="columns"
@@ -24,8 +26,8 @@
         </template>
       </template>
     </a-table>
-  <CreatePronunciationExam :isOpen = "isOpenCreateModal" @closeModal = "isOpenCreateModal = false" v-if="isOpenCreateModal" @handleOk = "() => { isOpenCreateModal = false, fetchData() }">
-  </CreatePronunciationExam>
+  <CreatePronunciationExam :isOpen = "isOpenCreateModal" @closeModal = "isOpenCreateModal = false" v-if="isOpenCreateModal" @handleOk = "() => { isOpenCreateModal = false, fetchData() }"></CreatePronunciationExam>
+  
   <EditPronunciationExam :isOpen = "isOpenEditModal" @handleCancel = "isOpenEditModal = false" v-if="isOpenEditModal" :examId = "examId" @handleOk = "() => {isOpenEditModal = false ,  fetchData()}"></EditPronunciationExam>
 
   <Loading2 v-if = "isLoading2"></Loading2>
@@ -95,6 +97,15 @@ const deleteRecord = async (id) => {
 onMounted(() => {
   fetchData()
 })
+
+const getDeviceInfo = () => {
+  return {
+        userAgent: navigator.userAgent, // Thông tin trình duyệt
+        platform: navigator.platform, // Hệ điều hành
+        language: navigator.language, // Ngôn ngữ trình duyệt
+        screenResolution: `${window.screen.width}x${window.screen.height}`, // Độ phân giải màn hình
+    };
+}
 
 </script>
 
