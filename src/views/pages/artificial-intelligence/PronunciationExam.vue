@@ -1,14 +1,10 @@
 <template>
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
-    <!-- <div class="text-center" v-if="currentSectionQuestion?.audio">
-      <pre>{{ currentSectionQuestion?.audio }}</pre>
-      <audio :src="currentSectionQuestion?.audio" controls></audio>
-    </div> -->
   <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
-    <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result?.content">
+    <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result">
       <p>
-        <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" :strokeColor = "reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.color"/>
+        <a-progress type="circle" :percent="currentSectionQuestion?.pronunciation_result.point" :size="80" />
       </p>
       <p>
         <span class="pronunciation-exam-result-reaction" :class="reactionResult(currentSectionQuestion?.pronunciation_result?.point)?.className">
@@ -17,6 +13,7 @@
         </span>
       </p>
     </div>
+
     <div class="pronunciation-exam-question mt-4 p-3">
       <div class="pronunciation-exam-question-volumn text-start">
         <i class="fa-solid fa-backward-fast icon-circle text-primary"
@@ -27,7 +24,7 @@
       <div class="mt-3 text-center">
         <h4 v-if="currentSectionQuestion?.pronunciation_result?.result">
           <template v-for="(item,key) in JSON.parse(currentSectionQuestion?.pronunciation_result?.result)" :key="key">
-            <span class="pronunciation-exam-result-text" :class="textClass(item)">{{ item.text }}</span>&nbsp;
+            <span class="pronunciation-exam-result-text" :class="item.isCorrect ? 'text-success' : 'text-danger'">{{ item.text }}{{ item?.text?.split('')?.length > 1 ? '&nbsp;' : null }}</span>
           </template>
         </h4>
         
@@ -70,15 +67,11 @@
       </div>
 
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
-      <!-- <pre>{{ currentSectionQuestion?.pronunciation_result?.audio }}</pre> -->
-      <p class="mt-3">{{ currentSectionQuestion?.pronunciation_result?.content }}</p>
-      <!-- <pre>{{ examResult?.audioInfo }}</pre> -->
-      <!-- <p>isIOS : {{ isIOS }}</p> -->
-      <!-- <p>isSafari : {{ isSafari }}</p> -->
-      <!-- <p>confidence : {{ examResult?.confidence }}</p> -->
-      <!-- <p>words : {{ examResult?.words }}</p> -->
-      <!-- <pre>{{  currentSectionQuestion?.pronunciation_result?.result ? JSON.parse(currentSectionQuestion?.pronunciation_result?.result) : '' }}</pre> -->
-      <!-- <audio :src="currentSectionQuestion?.pronunciation_result?.audio" controls></audio> -->
+    
+      <pre>{{ audioURLNew }}</pre>
+      <!-- <pre>{{ examResult?.text }}</pre> -->
+    
+      <audio :src="audioURLNew" controls></audio>
     </div>
   </div>
   <Loading2 v-if="isLoading"></Loading2>
@@ -91,7 +84,7 @@ import { pronunciationStore, pronunciationResultStore } from '../../../store';
 import { onMounted, ref, watch } from 'vue';
 import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
-import toWav from 'audiobuffer-to-wav';
+import { message } from 'ant-design-vue';
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isLoading = ref(false)
@@ -102,7 +95,6 @@ const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
 const examResult = ref(null);
 const audioURLNew = ref(null);
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -145,22 +137,35 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
 }
 
 const startRecord = () => {
-  navigator.mediaDevices.getUserMedia({ 
-    audio: {
-        sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
+  navigator.mediaDevices.getUserMedia({ audio: {
+        // sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
         channelCount: 1, // Ghi âm mono
         echoCancellation: true, // Loại bỏ tiếng vang
         noiseSuppression: true, // Giảm nhiễu
         autoGainControl: true // Tự động điều chỉnh âm lượng
-    } 
-   }).then((stream) => {
-    currentSectionQuestion.value.isRecording = true;
+      }  
+    }).then((stream) => {
+      currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
       mimeType: "webm",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
+  }).catch((err) => {
+      if(err == 'NotFoundError: Requested device not found')
+      {
+        message.error('Không tìm thấy thiết bị ghi âm trên máy của bạn')
+      }
+      
+      else if(err == 'NotAllowedError: Permission denied')
+      {
+        message.error('Bạn đã từ chối quyền truy cập micro. Hãy cấp quyền và thử lại.')
+      }
+
+      else{
+        message.error('Đã có lỗi xảy ra. Vui lòng thử lại sau.')
+      }
   });
 }
 
@@ -169,33 +174,23 @@ const stopRecord = () => {
   recorder.value.stopRecording(async () => {
 
     const blob = recorder.value.getBlob();
-    // Convert WebM/MP4 to WAV
-    const audioContext = new AudioContext();
-    const fileReader = new FileReader();
-    fileReader.onload = async () => {
-      const arrayBuffer = fileReader.result;
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      const wavBlob = new Blob([toWav(audioBuffer)], { type: "audio/wav" });
-
-      const formData = new FormData();
-      pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
-      formData.append("audio", wavBlob,  "recorded_audio.wav");
-      formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
-      await pronunciationResultStore().storePronoun(formData).then((response) => {
-        if (response.status) {
-          isLoading.value = false;
-          examResult.value = response.data;
-          examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
-          playAudio(1, examResult.value.url)
-          audioURLNew.value = examResult.value.url;
-          fetchData();
-        }
-      }).catch((error) => {
-        console.log(error);
+    const formData = new FormData();
+    pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
+    formData.append("audio", blob, "recorded_audio.wav");
+    formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+    await pronunciationResultStore().storePronoun(formData).then((response) => {
+      if (response.status) {
         isLoading.value = false;
-      });
-    }
-    fileReader.readAsArrayBuffer(blob);
+        examResult.value = response.data;
+        examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
+        playAudio(1, examResult.value.url)
+        audioURLNew.value = examResult.value.url;
+        // fetchData();
+      }
+    }).catch((error) => {
+      console.log(error);
+      isLoading.value = false;
+    });
   });
 }
 
@@ -226,59 +221,32 @@ const reactionResult = (score) => {
   let className = '';
   let text = '';
   let icon = '';
-  let color = '';
-
   
     if(score < 70)
     {
       className = 'text-danger';
       text = 'Try again';
-      icon = 'fa-solid fa-face-sad-cry';
-      color = '#dc3545';
+      icon = 'fa-solid fa-face-sad-cry'
     }
 
-    if(score >= 70 && score < 85)
+    if(score >= 70 && score <= 89)
     {
       className = 'text-warning';
       text = 'Almost correct';
-      icon = 'fa-solid fa-face-laugh';
-      color = '#ffc107';
-  
+      icon = 'fa-solid fa-face-laugh'
     }
 
-    if(score >= 85)
+    if(score >= 90)
     {
       className = 'text-success';
       text = 'Great job';
-      icon = 'fa-solid fa-face-grin-hearts';
-      color = '#198754';
+      icon = 'fa-solid fa-face-grin-hearts'
     }
     return {
       className,
       text,
-      icon,
-      color
+      icon
     }
-}
-
-const textClass = (word) => {
-  let className = ''
-  if(word?.confidence < 70)
-  {
-    className = 'text-danger'
-  }
-  if(word?.confidence >= 70 && word?.confidence < 85)
-  {
-    className = 'text-warning'
-  }
-  if(word?.confidence >= 85)
-  {
-    className = 'text-success'
-  }
-     
-  console.log(className);
-  
-  return className;
 }
 
 watch(currentSection, (newValue, oldValue) => {

@@ -30,16 +30,11 @@
             </table>
     </div>
   </a-modal>
-  <Loading2 v-if = "isLoading"></Loading2>
 </template>
 
 <script setup>
 import { onMounted, ref, toRefs } from 'vue';
 import { pronunciationStore } from '../../../store';
-import { message } from 'ant-design-vue';
-import Loading2 from '../../components/Loading2.vue';
-
-const isLoading = ref(false);
 const props = defineProps(['isOpen', 'examId'])
 const { isOpen, examId } = toRefs(props)
 const emits = defineEmits(['handleCancel', 'handleOk'])
@@ -74,7 +69,6 @@ const deleteQuestion = (questionKey) => {
 }
 
 const updateExam = async() => {
-    isLoading.value = true;
     const formData = new FormData();
     formData.append('topic_name', pronunciation.value.topic_name || '');
     pronunciation.value.pronunciation_details.forEach((detail, index) => {
@@ -85,11 +79,8 @@ const updateExam = async() => {
         }
     });
 
-    await pronunciationStore().updatePronunciationExam(examId.value, formData).then((response) => {
-        console.log(response);
-        
+    await pronunciationStore().updateExam(examId.value, formData).then((response) => {
         emits('handleOk');
-        isLoading.value = false;
         message.success('Cập nhật bài tập thành công');
     }).catch((error) => {
         console.log(error);
