@@ -69,7 +69,7 @@
       <input type="file" class="mt-3 form-control" @change="uploadAudio($event)">
     
       <pre>{{ audioURLNew }}</pre>
-      <pre>{{ examResult?.text }}</pre>
+      <!-- <pre>{{ examResult?.text }}</pre> -->
     
       <audio :src="audioURLNew" controls></audio>
     </div>
@@ -84,6 +84,7 @@ import { pronunciationStore, pronunciationResultStore } from '../../../store';
 import { onMounted, ref, watch } from 'vue';
 import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
+import { message } from 'ant-design-vue';
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isLoading = ref(false)
@@ -136,22 +137,35 @@ const playAudioQuestion = (speed = 1, audioUrl = null) => {
 }
 
 const startRecord = () => {
-  navigator.mediaDevices.getUserMedia({ 
-    audio: {
-        sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
+  navigator.mediaDevices.getUserMedia({ audio: {
+        // sampleRate: 16000, // Chuẩn âm thanh chất lượng cao (44.1kHz)
         channelCount: 1, // Ghi âm mono
         echoCancellation: true, // Loại bỏ tiếng vang
         noiseSuppression: true, // Giảm nhiễu
         autoGainControl: true // Tự động điều chỉnh âm lượng
-    } 
-   }).then((stream) => {
-    currentSectionQuestion.value.isRecording = true;
+      }  
+    }).then((stream) => {
+      currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: "audio/wav",
+      mimeType: "webm",
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
+  }).catch((err) => {
+      if(err == 'NotFoundError: Requested device not found')
+      {
+        message.error('Không tìm thấy thiết bị ghi âm trên máy của bạn')
+      }
+      
+      else if(err == 'NotAllowedError: Permission denied')
+      {
+        message.error('Bạn đã từ chối quyền truy cập micro. Hãy cấp quyền và thử lại.')
+      }
+
+      else{
+        message.error('Đã có lỗi xảy ra. Vui lòng thử lại sau.')
+      }
   });
 }
 
@@ -171,7 +185,7 @@ const stopRecord = () => {
         examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
         playAudio(1, examResult.value.url)
         audioURLNew.value = examResult.value.url;
-        fetchData();
+        // fetchData();
       }
     }).catch((error) => {
       console.log(error);
