@@ -70,7 +70,8 @@
     
       <pre>{{ audioURLNew }}</pre>
       <!-- <pre>{{ examResult?.text }}</pre> -->
-    
+      <pre>{{ isSafari }}</pre>
+      <pre>{{ mimeType }}</pre>
       <audio :src="audioURLNew" controls></audio>
     </div>
   </div>
@@ -86,7 +87,6 @@ import TimerDisplay from './TimerDisplay.vue';
 import RecordRTC from "recordrtc";
 import { message } from 'ant-design-vue';
 
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isLoading = ref(false)
 const route = useRoute();
 const recorder = ref(null)
@@ -95,6 +95,8 @@ const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
 const examResult = ref(null);
 const audioURLNew = ref(null);
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const mimeType = isSafari ? 'audio/wav' : 'audio/webm';
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -146,9 +148,9 @@ const startRecord = () => {
       }  
     }).then((stream) => {
       currentSectionQuestion.value.isRecording = true;
-    recorder.value = new RecordRTC(stream, { 
+      recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: "webm",
+      mimeType: mimeType,
       desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
   });
     recorder.value.startRecording();
