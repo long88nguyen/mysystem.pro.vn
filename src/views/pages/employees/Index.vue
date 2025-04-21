@@ -1,5 +1,7 @@
 <template>
   <div class="w-100">
+    <pre>{{  getDeviceInfo()  }}</pre>
+    <pre>{{ result }}</pre>
     <div class="text-end">
       <a-button @click="openModal">+ Add new record</a-button>
     </div>
@@ -71,6 +73,13 @@ const sendEmail = async() => {
   } 
 }
 
+import {UAParser} from 'ua-parser-js';
+
+// Khởi tạo parser
+const parser = new UAParser();
+const result = parser.getResult();
+
+
 const columns = ref([
   {
     title: "No.",
@@ -138,8 +147,53 @@ const deleteRecord = async (employeeId) => {
 const changePage = (page) => {
   fetchData({ page: page });
 };
+
+
+const getDeviceInfo = () => {
+  const ua = navigator.userAgent;
+  let os = 'Unknown OS';
+  let browser = 'Unknown Browser';
+  let device = /Mobi|Android|iPhone|iPad|iPod/i.test(ua) ? 'Mobile' : 'Desktop';
+
+  // Hệ điều hành + version
+  if (ua.includes('Windows NT 10.0')) os = 'Windows 10';
+  else if (ua.includes('Windows NT 6.1')) os = 'Windows 7';
+  else if (ua.includes('Mac OS X')) {
+    const macVer = ua.match(/Mac OS X (\d+)[_.](\d+)[_.]?(\d+)?/);
+    if (macVer) os = `macOS ${macVer[1]}.${macVer[2]}.${macVer[3] || 0}`;
+    else os = 'macOS';
+  }
+  else if (ua.includes('Android')) {
+    const androidVer = ua.match(/Android (\d+)\.?(\d+)?\.?(\d+)?/);
+    if (androidVer) os = `Android ${androidVer[1]}.${androidVer[2] || 0}.${androidVer[3] || 0}`;
+    else os = 'Android';
+  }
+  else if (ua.includes('like Mac OS X')) {
+    // iOS detection
+    const iosVer = ua.match(/OS (\d+)[_.]?(\d+)?[_.]?(\d+)?/);
+    if (iosVer) os = `iOS ${iosVer[1]}.${iosVer[2] || 0}.${iosVer[3] || 0}`;
+    else os = 'iOS';
+  }
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  // Trình duyệt
+  if (ua.includes('Firefox')) browser = 'Firefox';
+  else if (ua.includes('Edg')) browser = 'Edge';
+  else if (ua.includes('OPR') || ua.includes('Opera')) browser = 'Opera';
+  else if (ua.includes('Chrome') && ua.includes('Safari')) browser = 'Chrome';
+  else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+  else if (ua.includes('Trident') || ua.includes('MSIE')) browser = 'Internet Explorer';
+
+  return {
+    os,
+    browser,
+    device,
+    userAgent: ua
+  };
+};
 onMounted(() => {
   fetchData();
+  getDeviceInfo();
 });
 </script>
 
