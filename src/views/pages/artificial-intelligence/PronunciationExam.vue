@@ -1,6 +1,8 @@
 <template>
   <h5>Làm bài tập</h5>
   <h5>Chủ đề: <span class="text-primary"> {{ pronunciationData?.topic_name }}</span></h5>
+  {{ logBob?.size }},
+  {{ logBob?.type }}
   <div class="pronunciation-exam mt-3 p-4" v-if="currentSectionQuestion">
     <div class="pronunciation-exam-result text-center" v-if="currentSectionQuestion?.pronunciation_result">
       <p>
@@ -95,6 +97,7 @@ const currentSectionQuestion = ref(null)
 const pronunciationData = ref(null);
 const examResult = ref(null);
 const audioURLNew = ref(null);
+const logBob = ref(null)
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -148,8 +151,10 @@ const startRecord = () => {
       currentSectionQuestion.value.isRecording = true;
     recorder.value = new RecordRTC(stream, { 
       type: "audio", 
-      mimeType: "webm",
-      desiredSampRate: 16000 // Chuẩn nén Whisper yêu cầu 16kHz
+      mimeType: "audio/wav", // tương thích Safari
+      desiredSampRate: 16000,
+      recorderType: RecordRTC.StereoAudioRecorder, // đảm bảo định dạng đúng
+      numberOfAudioChannels: 1,
   });
     recorder.value.startRecording();
   }).catch((err) => {
@@ -172,25 +177,38 @@ const startRecord = () => {
 const stopRecord = () => {
   isLoading.value = true;
   recorder.value.stopRecording(async () => {
-
-    const blob = recorder.value.getBlob();
-    const formData = new FormData();
-    pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
-    formData.append("audio", blob, "recorded_audio.wav");
-    formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
-    await pronunciationResultStore().storePronoun(formData).then((response) => {
-      if (response.status) {
-        isLoading.value = false;
-        examResult.value = response.data;
-        examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
-        playAudio(1, examResult.value.url)
-        audioURLNew.value = examResult.value.url;
-        // fetchData();
-      }
-    }).catch((error) => {
-      console.log(error);
-      isLoading.value = false;
-    });
+    try {
+      setTimeout(async() => {
+        const blob = recorder.value.getBlob();
+        logBob.value = blob;
+        if (!blob || blob.size === 0) {
+          message.error("Không có dữ liệu ghi âm. Vui lòng thử lại.");
+          isLoading.value = false;
+          return;
+        }
+        const formData = new FormData();
+        pronunciationData.value.pronunciation_details[currentSection.value].isRecording = false;
+        formData.append("audio", blob, "recorded_audio.wav");
+        formData.append("pronunciation_detail_id", pronunciationData.value.pronunciation_details[currentSection.value].id);
+        await pronunciationResultStore().storePronoun(formData).then((response) => {
+          if (response.status) {
+            isLoading.value = false;
+            examResult.value = response.data;
+            examResult.value.url = response.data?.url ? `${response.data?.url}?t=${Date.now()}` : null;
+            playAudio(1, examResult.value.url)
+            audioURLNew.value = examResult.value.url;
+            // fetchData();
+          }
+        }).catch((error) => {
+          console.log(error);
+          isLoading.value = false;
+        });
+      }, 500)
+    }
+    catch(error) {
+      console.error('Lỗi khi lấy blob:', error);
+    }
+    
   });
 }
 
