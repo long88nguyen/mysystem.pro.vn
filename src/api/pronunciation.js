@@ -26,3 +26,8 @@ export const deletePronunciationExam = async (id) => {
     const response = await request.delete(`${path}/delete/${id}`)
     return response
 }
+
+export const uploadFileAWS = async (form) => {
+    const response = await request.post(`/upload-file`, form)
+    return response
+}

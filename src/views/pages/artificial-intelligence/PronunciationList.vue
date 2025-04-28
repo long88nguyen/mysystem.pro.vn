@@ -3,8 +3,8 @@
   <div class="text-end">
     <a-button type = "primary" @click="isOpenCreateModal = true">Tạo mới bài tập</a-button>
   </div>
-  <pre>{{ getDeviceInfo() }}</pre>
-
+  <!-- <pre>{{ getDeviceInfo() }}</pre> -->
+  <input type="file" class="form-control my-2" @change="uploadFile($event)">
   <a-table
       :dataSource="dataTable"
       :columns="columns"
@@ -41,6 +41,7 @@ import EditPronunciationExam from './EditPronunciationExam.vue';
 import Loading2 from '../../components/Loading2.vue';
 import moment from 'moment';
 import { message } from 'ant-design-vue';
+import axios from 'axios';
 
 const examId = ref(null);
 const isLoading2 = ref(false);
@@ -105,6 +106,16 @@ const getDeviceInfo = () => {
         language: navigator.language, // Ngôn ngữ trình duyệt
         screenResolution: `${window.screen.width}x${window.screen.height}`, // Độ phân giải màn hình
     };
+}
+
+const uploadFile = async(e) => {
+    console.log(e.target.files[0]);
+    let form = new FormData();
+    form.append('file', e.target.files[0])
+    await pronunciationStore().uploadFileAWS(form).then((response) => {
+      console.log(response);
+      
+    })
 }
 
 </script>
