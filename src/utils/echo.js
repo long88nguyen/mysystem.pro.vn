@@ -10,11 +10,6 @@ const echo = new Echo({
     wssPort: 443, // Khi dùng HTTPS
     forceTLS: true, // Bật nếu dùng HTTPS
     enabledTransports: ['ws', 'wss'],
-    auth: {
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        }
-    }
 });
 
 export default echo;
