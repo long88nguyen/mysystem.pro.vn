@@ -21,7 +21,12 @@ const router = createRouter({
                 component: () => import('../views/pages/employees/Index.vue'),
               },
               ...chat,
-              ...artificial_intelligence
+              ...artificial_intelligence,
+              {
+                path: "/notifications",
+                name: "Notifications",
+                component: () => import('../views/pages/notifications/Notifications.vue'),
+              },
             ],
 
         },

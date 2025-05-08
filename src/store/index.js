@@ -6,3 +6,4 @@ export * from './modules/chatRoomStore';
 export * from './modules/chatMessageStore';
 export * from './modules/pronunciationStore';
 export * from './modules/pronunciationResultStore';
+export * from './modules/notificationStore';
